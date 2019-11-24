@@ -1,0 +1,3 @@
+This script is for fetch data from tweet. Argument options is:
+--filter : This for fetch tweet by filter. You cvan give many filter parameters.
+            Example --filter trump  
