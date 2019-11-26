@@ -20,11 +20,6 @@ class textCleaner():
         tmpWordList = [word for word in tweet if word not in self._stopwords]
         for index, i in  enumerate(tmpWordList):
             tmp = self.cleanEmoji(i)
-            if(i == 'rt'):
-                continue
-            if(i[0] == "'s"):
-                tmpWordList[index-1].join(i)
-                continue
             if(tmp != "" and tmp != ''):
                 result.append(tmp)
         return result
