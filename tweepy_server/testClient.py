@@ -4,7 +4,7 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
 import json
-import unicode2utf8, os
+import  os
 from datetime import datetime
 def receive():
     """Handles receiving of messages."""
@@ -16,7 +16,6 @@ def receive():
             msg = client_socket.recv(BUFSIZ).decode("utf-8")
            # msg = encoder.convert(msg)
             #msg_list.insert(tkinter.END, msg )
-            print(msg)
             with open(filename,"a", encoding='utf-8') as f :
                 f.write(msg)
                 f.write(", \n")

@@ -6,10 +6,10 @@ class tweet_preprocess():
         pass
 
     def preprocessTweet(self, tweet):
-        tweet["text"] = self.preprocessText(tweet["text"])
+        tweet["text"] = self.__preprocessText(tweet["text"])
         return [tweet["created_at"], tweet["msg"]]
 
-    def preprocessText(self, text):
+    def __preprocessText(self, text):
         tc = textCleaner()
         text = tc.preprocess(text)
         return text
