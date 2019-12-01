@@ -2,7 +2,7 @@ from tweepy.streaming import StreamListener
 import json
 import socket
 #from utils.textCleaner import textCleaner
-from store.cassandra.connection import Adapter
+from store.cassandra.sqlFunctions import SqlFunctions
 class TwitterListener(StreamListener):
     """
     Basic twitter listener
@@ -10,14 +10,14 @@ class TwitterListener(StreamListener):
    
     def __init__(self, c_socket):
         self.c_socket = c_socket
-        self.Adapter = Adapter()
+        self.sqlFunctions = SqlFunctions()
 
     def on_data(self,data):
         msg = json.loads(data)
         tweet = msg["text"]
         #tweet = textCleaner().cleanEmoji(text=tweet)
         msg["text"] = tweet
-        self.Adapter.insertTweet(data)
+        self.sqlFunctions.insertTweet(data)
         self.c_socket.send(bytes(str(msg),'utf-8'))
         return True
 
