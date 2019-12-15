@@ -1,5 +1,5 @@
 import re
-import unicode2utf8
+from .unicode2utf8 import unicode2utf8
 from nltk.tokenize import word_tokenize
 from string import punctuation 
 from nltk.corpus import stopwords 
@@ -17,7 +17,7 @@ class textCleaner():
         tweet = re.sub(r'#([^\s]+)', r'\1', tweet) # remove the # in #hashtag
         tweet = word_tokenize(tweet) # remove repeated characters (helloooooooo into hello)
         result = []
-        tmpWordList = [word for word in tweet if word not in self._stopwords]
+        tmpWordList = [word for word in tweet if word not in self._stopwords and word != 'rt']
         for index, i in  enumerate(tmpWordList):
             tmp = self.cleanEmoji(i)
             if(tmp != "" and tmp != ''):
