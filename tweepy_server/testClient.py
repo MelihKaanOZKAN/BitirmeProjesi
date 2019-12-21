@@ -26,7 +26,7 @@ class CreateSample():
             
             with open(self.filename_test, 'a', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow([tweet["id"], ptext])
+                    writer.writerow(ptext)
             self.test = self.test - 1
         else:
             self.createTrain(tweet)
@@ -47,7 +47,7 @@ def receive():
     SampleMaker = CreateSample(300, 100)
     while True:
         try:
-            msg = client_socket.recv(30000).decode("utf-8")
+            msg = client_socket.recv(15000).decode("utf-8")
             print("e------")
             print(msg)
             print("e------")

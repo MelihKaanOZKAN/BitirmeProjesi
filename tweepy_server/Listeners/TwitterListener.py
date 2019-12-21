@@ -24,7 +24,7 @@ class TwitterListener(StreamListener):
         print("------")
         print(msg)
         print("------")
-        self.c_socket.send(bytes(msg, encoding='utf-8'))
+        self.c_socket.send(bytes(msg["text"], encoding='utf-8'))
         return True
 
     def error(self, status):
