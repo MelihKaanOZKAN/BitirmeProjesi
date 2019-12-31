@@ -1,3 +1,2 @@
 --filter
-trump
-clinton
+news

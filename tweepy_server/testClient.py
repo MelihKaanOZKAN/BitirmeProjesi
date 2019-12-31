@@ -22,11 +22,11 @@ class CreateSample():
             print("------")
             print(tweet)
             print("------")
-            ptext =  self.tc.preprocess(tweet["text"])
+            #ptext =  self.tc.preprocess(tweet)
             
             with open(self.filename_test, 'a', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow(ptext)
+                    writer.writerow(tweet)
             self.test = self.test - 1
         else:
             self.createTrain(tweet)
@@ -35,10 +35,10 @@ class CreateSample():
             print("------")
             print(tweet)
             print("------")
-            ptext =  self.tc.preprocess(tweet["text"])
+            #ptext =  self.tc.preprocess(tweet)
             with open(self.filename_train, 'a', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow([tweet["id"], ptext])
+                    writer.writerow(tweet)
             self.train = self.train - 1
         else:
             sys.exit(0)
@@ -47,11 +47,11 @@ def receive():
     SampleMaker = CreateSample(300, 100)
     while True:
         try:
-            msg = client_socket.recv(15000).decode("utf-8")
-            print("e------")
+            msg = client_socket.recv(4096).decode("utf-8")
+            print("------")
             print(msg)
-            print("e------")
-            msg = json.loads(msg, )
+            print("------")
+            
             # msg = encoder.convert(msg)
             #msg_list.insert(tkinter.END, msg )
             SampleMaker.createTest(msg)

@@ -1,13 +1,3 @@
-unicode,utf8
-ğ,\u011f
-Ğ,\ 
-ı,\u0131
-İ,\u0130
-ö,\u00f6
-Ö,\u00d6
-ü,\u00fc
-Ü - \u00dc
-ş - \u015f
-Ş - \u015e
-ç - \u00e7
-Ç - \u00c7
+version https://git-lfs.github.com/spec/v1
+oid sha256:128f6243e7eedfa491d6db6a48cb2a41cb5da4de8f70198b0a24390e4b0d5d0c
+size 138

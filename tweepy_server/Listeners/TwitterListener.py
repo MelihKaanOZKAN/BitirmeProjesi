@@ -18,13 +18,13 @@ class TwitterListener(StreamListener):
     def on_data(self,data):
         msg = json.loads(data)
       #  self.sqlFunctions.insertTweet(data)
-        msg = json.dumps(msg, ensure_ascii=False)
-        msg = self.jsonF.format(msg)
-        #msg = msg.replace('="', "=>'")
         print("------")
         print(msg)
         print("------")
-        self.c_socket.send(bytes(msg["text"], encoding='utf-8'))
+        msg = msg["text"]
+        msg = self.jsonF.format(msg)
+        #msg = msg.replace('="', "=>'")
+        self.c_socket.send(bytes(msg, encoding='utf-8'))
         return True
 
     def error(self, status):
