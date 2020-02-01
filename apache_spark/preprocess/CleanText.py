@@ -11,8 +11,10 @@ class CleanText():
     def __init__(self):
         pass
 
-    def clean(self, dataFrame: DataFrame, sqlContext : SQLContext, ):
-        textCleaner = udf(lambda x: tc.preprocess(tweet=x), StringType())
-        self.__spark.udf.register("textCleaner", textCleaner)
-        df2 : DataFrame = dataFrame.select(textCleaner(dataFrame("rawData")))
-        return df2
+    def clean(self, dataFrame: DataFrame, spark:SQLContext ):
+        tc_ = tc()
+        textCleaner = udf(lambda x: tc_.preprocess(tweet=x), StringType())
+        spark.udf.register("textCleaner", textCleaner)
+        dataFrame = dataFrame.filter('rawData != ""')
+        dataFrame = dataFrame.filter('rawData != " "')
+        return dataFrame.withColumn("preprocessedData", textCleaner(dataFrame['rawData']))

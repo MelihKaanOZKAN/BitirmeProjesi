@@ -12,7 +12,7 @@ class TrainData():
     neutral = []
     negative = []
     fileDir = os.path.dirname(os.path.realpath(__file__))
-    def __init__(self, dataset_train = "training.1600000.processed.noemoticon.csv", dataset_test  = "testdata.manual.2009.06.14.csv"):
+    def __init__(self, dataset_train = "training.1600000.processed.noemoticon.csv.nosync", dataset_test  = "testdata.manual.2009.06.14.csv.nosync"):
         self.dataset_train = dataset_train
         self.dataset_test = dataset_test
         self.cleaner = textCleaner()
@@ -64,7 +64,7 @@ class TrainData():
         totalrow = totalRow_test + totalRow_train
         print("Loading Dataset... Train:")
         print("Total Set: {} \nTrain Set: {}\nTest Set: {}".format(totalrow, totalRow_train, totalRow_test))"""
-        self.loadTrain()
+        #self.loadTrain()
         self.loadTest()
         print("Dataset Loaded...")
 

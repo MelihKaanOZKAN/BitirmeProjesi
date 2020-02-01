@@ -44,7 +44,7 @@ class word2vecExt():
     try:
       print('Loading model..')
       fileDir = os.path.dirname(os.path.realpath(__file__))
-      filename = os.path.join(fileDir, 'models/GoogleNews-vectors-negative300.bin')
+      filename = os.path.join(fileDir, 'models/GoogleNews-vectors-negative300.bin.nosync.bin')
       self.__model = gensim.models.KeyedVectors.load_word2vec_format(filename, binary=True)
       print("Model loaded..")
     except:
@@ -81,41 +81,40 @@ class word2vecExt():
     
   def similarity(self, word1, word2):
     """Calculates similarity of two words
-    
+
     Parameters:
     word1: a word 
     word2: othor word
 
-
     Return:
     float: Similarity
-
-
     """
     self.__checkModel()
     self.__checkWords([word1, word2])
     return self.__model.similarity(word1, word2)
 
   def positiveNegative(self,word):
-     """Calculates positive and negative ratios
-    
+    """Calculates positive and negative ratios
+
     Parameters:
     word: a word 
-
+    word : list
 
     Return:
     list: [positive-ratio, negative-ratio]
-
-
     """
     self.__checkModel()
-    self.__chechWords([word])
+    self.__checkWords([word])
     try:
-      positive =  self.__model.n_similarity(self.__positive, [word])
-      negative =  self.__model.n_similarity(self.__negative, [word])
+      if(type(word) == type(list)):
+        positive =  self.__model.n_similarity(self.__positive, word)
+        negative =  -1 * self.__model.n_similarity(self.__negative, word)
+      else:
+        positive =  self.__model.n_similarity(self.__positive, [word])
+        negative =  -1 * self.__model.n_similarity(self.__negative, [word])
       return [positive, negative]
     except:
-      KeyError("word not in vocabulary")
+      return [0, 0]
   def __test(self):
     invocabp = []
     invocabn = []

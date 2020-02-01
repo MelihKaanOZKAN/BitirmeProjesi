@@ -24,7 +24,7 @@ class TwitterListener(StreamListener):
         msg = msg["text"]
         msg = self.jsonF.format(msg)
         #msg = msg.replace('="', "=>'")
-        self.c_socket.send(bytes(msg, encoding='utf-8'))
+        self.c_socket.send(msg.encode("utf-8"))
         return True
 
     def error(self, status):
