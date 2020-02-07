@@ -18,3 +18,4 @@ class CleanText():
         dataFrame = dataFrame.filter('rawData != ""')
         dataFrame = dataFrame.filter('rawData != " "')
         return dataFrame.withColumn("preprocessedData", textCleaner(dataFrame['rawData']))
+

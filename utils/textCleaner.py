@@ -4,6 +4,12 @@ from nltk.tokenize import word_tokenize
 from string import punctuation 
 from nltk.corpus import stopwords 
 import emoji
+from pyspark.sql import DataFrame
+from pyspark.ml.feature import HashingTF, IDF, Tokenizer
+from pyspark.ml.feature import StringIndexer
+from pyspark.ml import Pipeline
+
+
 class textCleaner():
     
     def __init__(self):
@@ -34,6 +40,18 @@ class textCleaner():
                     tmp = tmp.replace("\t", "")
                     result.append(tmp)
         return result
+
+    def preproccess_train_spark(self, train_set, val_set, dataFrame: DataFrame):
+        tokenizer = Tokenizer(inputCol="text", outputCol="words")
+        hashtf = HashingTF(numFeatures=2 ** 16, inputCol="words", outputCol='tf')
+        idf = IDF(inputCol='tf', outputCol="features", minDocFreq=5)  # minDocFreq: remove sparse terms
+        label_stringIdx = StringIndexer(inputCol="target", outputCol="label")
+        pipeline = Pipeline(stages=[tokenizer, hashtf, idf, label_stringIdx])
+        pipelineFit = pipeline.fit(train_set)
+        train_df = pipelineFit.transform(train_set)
+        val_df = pipelineFit.transform(val_set)
+        return train_df, val_df
+
     def filter(self, text):
         res = True
         if(text == "" ):

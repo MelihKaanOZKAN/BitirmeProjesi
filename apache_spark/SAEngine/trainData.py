@@ -1,4 +1,4 @@
-import csv, os, math, sys
+import csv, os, sys
 sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi')
 from utils.textCleaner import textCleaner
 
@@ -11,8 +11,11 @@ class TrainData():
     positive = []
     neutral = []
     negative = []
+    positive_test = []
+    neutral_test = []
+    negative_test = []
     fileDir = os.path.dirname(os.path.realpath(__file__))
-    def __init__(self, dataset_train = "training.1600000.processed.noemoticon.csv.nosync", dataset_test  = "testdata.manual.2009.06.14.csv.nosync"):
+    def __init__(self, dataset_train = "training.1600000.processed.noemoticon.csv.nosync.csv", dataset_test  = "testdata.manual.2009.06.14.csv.nosync"):
         self.dataset_train = dataset_train
         self.dataset_test = dataset_test
         self.cleaner = textCleaner()
@@ -80,6 +83,7 @@ class TrainData():
         self.testSet = newTestSet
         self.trainSet = newTrainSet
         print("textPrepare done")
+
     def strList(self, list):
         res = ""
         for index,i  in enumerate(list):
@@ -97,6 +101,13 @@ class TrainData():
                 self.neutral.append(self.trainSet[index])
             if(i == "4"):
                 self.positive.append(self.trainSet[index])
+        for index, i in enumerate(self.testLabel):
+            if (i == "0"):
+                self.negative_test.append(self.testSet[index])
+            if (i == "2"):
+                self.neutral_test.append(self.testSet[index])
+            if (i == "4"):
+                self.positive_test.append(self.testSet[index])
     def saveDataAsTextFile(self):
         filename = os.path.join(self.fileDir, 'samples/'+self.dataset_train+"_positive.txt")
         with open(filename, mode="a") as file:
