@@ -1,6 +1,6 @@
 import csv, os, sys
 sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi')
-from utils.textCleaner import textCleaner
+from utils import textCleaner
 
 class TrainData():
     trainRatio = 80

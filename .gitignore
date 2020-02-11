@@ -1,3 +1,4 @@
 /apache_spark/SAEngine/samples/
 /utils/wordLists
 /utils/models
+/apache_spark/SAEngine/naiveBayes/naiveBayes.model

@@ -6,7 +6,7 @@ from threading import Thread
 dir_path = os.path.dirname(os.path.realpath(__file__))
 parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
 sys.path.insert(0, parent_dir_path)
-from utils.textCleaner import textCleaner
+from utils import textCleaner
 class CreateSample():
     now = datetime.now()
     here = os.path.dirname(os.path.abspath(__file__))
