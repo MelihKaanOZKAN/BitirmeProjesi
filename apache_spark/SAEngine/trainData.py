@@ -29,7 +29,6 @@ class TrainData():
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
-                print(row)
                 if line_count == 0:
                     line_count += 1
                 else:
@@ -43,6 +42,8 @@ class TrainData():
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
+                if line_count == 100:
+                    return
                 if line_count == 0:
                     line_count += 1
                 else:
@@ -67,7 +68,7 @@ class TrainData():
         totalrow = totalRow_test + totalRow_train
         print("Loading Dataset... Train:")
         print("Total Set: {} \nTrain Set: {}\nTest Set: {}".format(totalrow, totalRow_train, totalRow_test))"""
-        #self.loadTrain()
+        self.loadTrain()
         self.loadTest()
         print("Dataset Loaded...")
 

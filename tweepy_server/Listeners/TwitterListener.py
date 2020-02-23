@@ -1,6 +1,6 @@
 from tweepy.streaming import StreamListener
 import json
-import socket, sys, os
+import socket, sys, os, time
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.JsonFormatter import JsonFormatter
 #from utils.textCleaner import textCleaner
@@ -18,14 +18,18 @@ class TwitterListener(StreamListener):
     def on_data(self,data):
         try:
             msg = json.loads(data)
+
+
+            msg =   msg["id_str"] + msg["text"] + "</tweet>"
           #  self.sqlFunctions.insertTweet(data)
-            print("------")
-            print(msg)
-            print("------")
-            msg = msg["text"]
-            msg = self.jsonF.format(msg)
-            #msg = msg.replace('="', "=>'")
+            #msg["text"].replace('"','\\"')
+            #msg = "{\"id\":\""+  msg["id_str"] + "\", \"raw_data\":\"" +  msg["text"] + "\"}"
+            #msg = self.jsonF.format(msg)
+
+
+            # msg = msg.replace('="', "=>'")
             self.c_socket.send(msg.encode("utf-8"))
+
             return True
         except KeyError:
             return True
