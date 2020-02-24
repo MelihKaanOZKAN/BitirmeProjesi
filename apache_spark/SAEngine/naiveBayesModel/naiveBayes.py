@@ -46,8 +46,9 @@ class naiveBayes(SAEngine):
                   )
 
         else:
+            print("Using custom SparkContext.. Skipping.. ")
             self.__sc = customSparkContext
-
+            self.loadModelFromDisk()
         self.__SQLContext = SQLContext(self.__sc)
         print("Complate..\n")
 
@@ -143,12 +144,11 @@ class naiveBayes(SAEngine):
 
 
     def predict_df(self, dataFrame: DataFrame):
-        sc = self.__sc
-        _nbp = nbp.NaiveBayesPredict()
-        _nbp.loadModel(sc)
-        df = self.cleanTextOnDF(dataFrame)
-        df = self.__preprocess_tdfidf(df)
-        df = df.withColunmn("sentiment", _nbp.model.predict(df["features"]))
+        __model: NaiveBayesModel = self.__model
+        #df = self.cleanTextOnDF(dataFrame)
+        df = self.__preprocess_tdfidf(dataFrame)
+        df: DataFrame = __model.transform(df)
+        df = df.withColumn("sentiment", df["predict_"]).drop("tf").drop("features").drop("rawPrediction").drop("probability").drop("predict_")
         return df
 
     def testModel_df(self, df: DataFrame):
@@ -229,8 +229,3 @@ def convert_to_LabeledPoint(row):
     idf = compIDF(tf)
     tf_idf = compTFIDF(tf, idf)
     return LabeledPoint(label,tf_idf)
-
-sc = naiveBayes()
-sc.loadModelFromDisk()
-df = sc.load_test()
-sc.testModel_df(df)

@@ -16,13 +16,11 @@ class DataFrameWorks():
         #rdd = rdd.map(lambda l: l.replace("½",""))
 
         rdd =  rdd.map(lambda l: (l[:18], l[19:]))
-        print(rdd.take(20))
         schema = [StructField("id", StringType(), False),
                   StructField("rawData", StringType(), False),
                   StructField("preprocessedData", ArrayType(elementType=StringType(), containsNull=True), True),
-                  StructField("features", ArrayType(elementType=FloatType(), containsNull=True), True),
                   StructField("sentiment", FloatType(), True)]
         final_struct = StructType(fields=schema)
-        rdd =rdd.map(lambda l: (l[0],l[1], [None],[None], None))
+        rdd =rdd.map(lambda l: (l[0],l[1], [None], None))
         return SqlObject.createDataFrame(rdd, schema=final_struct)
 

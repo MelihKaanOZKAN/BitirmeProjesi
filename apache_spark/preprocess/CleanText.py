@@ -15,6 +15,7 @@ class CleanText():
         spark.udf.register("textCleaner", textCleaner)
         dataFrame = dataFrame.filter('rawData != ""')
         dataFrame = dataFrame.filter('rawData != " "')
+        #dataFrame = dataFrame.filter('rawData != "empty"')
         return dataFrame.withColumn("preprocessedData", textCleaner(dataFrame['rawData']))
 
 
