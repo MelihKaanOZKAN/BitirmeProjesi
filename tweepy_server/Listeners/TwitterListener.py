@@ -1,15 +1,16 @@
 from tweepy.streaming import StreamListener
 import json
-import socket, sys, os, time
+import sys, os
+
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.JsonFormatter import JsonFormatter
 #from utils.textCleaner import textCleaner
-from store.cassandra.sqlFunctions import SqlFunctions
+from tweepy_server.store.cassandra import SqlFunctions
 class TwitterListener(StreamListener):
     """
     Basic twitter listener
     """
-   
+    sentimentId = 0
     def __init__(self, c_socket):
         self.c_socket = c_socket
         self.sqlFunctions = SqlFunctions()
@@ -20,8 +21,8 @@ class TwitterListener(StreamListener):
             msg = json.loads(data)
 
 
+            self.sqlFunctions.insertTweet( self.sentimentId, data)
             msg =   msg["id_str"] + msg["text"]
-            self.sqlFunctions.insertTweet(data)
             #msg["text"].replace('"','\\"')
             #msg = "{\"id\":\""+  msg["id_str"] + "\", \"raw_data\":\"" +  msg["text"] + "\"}"
             #msg = self.jsonF.format(msg)

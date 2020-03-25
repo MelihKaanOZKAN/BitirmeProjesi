@@ -1,7 +1,6 @@
-from  Streamers.TwitterStreamer import TwitterStreamer
+from tweepy_server.Streamers import TwitterStreamer
 import socket
 import threading
-import sys
 class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)

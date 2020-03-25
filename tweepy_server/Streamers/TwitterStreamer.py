@@ -1,7 +1,7 @@
-from Listeners.TwitterListener import TwitterListener  
-from TwitterAuthenticator.TwitterAuthenticator import TwitterAuthenticator
+from tweepy_server.Listeners import TwitterListener
+from tweepy_server.TwitterAuthenticator.TwitterAuthenticator import TwitterAuthenticator
 from tweepy import Stream
-import threading, os
+import os
 class TwitterStreamer():
     """
     Class for streaming and processing live tweets
@@ -21,8 +21,9 @@ class TwitterStreamer():
                 argv.append(tmp.replace('\n',''))
         #argv = argv.split(' ')
         print(argv)
-        if(argv[0] ==   "--filter"):
-            paramList = argv[1:]
+        if(argv[0] ==   "--ID"):
+            self.listener.sentimentId  = int(argv[1])
+            paramList = argv[2:]
             if(len(paramList) == 0):
                 print("a")
                 #self.c_socket.send(bytes"/msg/"+":/"Error: Missing parameters."/", 'utf-8'))
@@ -30,8 +31,9 @@ class TwitterStreamer():
                 #self.c_socket.send(bytes("Stream  tweets for this parameter(s):", 'utf-8'))
                 #for i in paramList:
                     #self.c_socket.send(bytes(i,'utf-8'))
-                
-                self.stream.filter(track=paramList, is_async=True)
+                if(paramList[0] == "--filter"):
+                    paramList= paramList[1:]
+                    self.stream.filter(track=paramList, is_async=True, languages=["en"])
         elif (argv[0] == "--help"):
             here = os.path.dirname(os.path.abspath(__file__))
             filename = os.path.join(here, 'help.txt')
@@ -39,4 +41,3 @@ class TwitterStreamer():
                 self.c_socket.send(bytes(f.read(), 'utf-8'))
         else:
             self.c_socket.send,(bytes("Wrong arguments.. Use --help for help", 'utf-8'))
-        

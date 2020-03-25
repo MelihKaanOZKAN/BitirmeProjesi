@@ -23,8 +23,8 @@ class naiveBayes(SAEngine):
     __trainData  = TrainData()
     __documents = []
     __documents_test = []
-    __modelPath = "hdfs://192.168.1.33:9000/NaiveBayes.model"
-    __trainPath = "hdfs://192.168.1.33:9000/trainingdata.csv"
+    __modelPath = "hdfs://78.186.219.59:9000/NaiveBayes.model"
+    __trainPath = "hdfs://40.87.68.229:9000/trainingdata.csv"
     __testPath = "hdfs://192.168.1.33:9000/testdata.csv"
     def __init__(self, customSparkContext = None):
         print("Initializing Naive Bayes..\n")

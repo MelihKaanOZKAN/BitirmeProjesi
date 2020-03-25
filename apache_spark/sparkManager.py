@@ -10,6 +10,7 @@ from apache_spark.preprocess.DataFrameWorks import DataFrameWorks
 from apache_spark.preprocess.CleanText import CleanText
 from apache_spark.SAEngine.naiveBayesModel import naiveBayes
 from utils.rddCorrector import rddCorrector
+from apache_spark.store.cassandra.save import save
 class sparkManager():
 
     __SAEngine = None
@@ -21,8 +22,8 @@ class sparkManager():
         conf = SparkConf()
         conf.setAppName(self.__appName)
         conf.setMaster(master)
-        conf.set("spark.executor.memory","3G")
-        conf.set("spark.driver.memory","3G")
+        conf.set("spark.executor.memory","4G")
+        conf.set("spark.driver.memory","4G")
         self.__sc = SparkContext(conf=conf)
         self.__ssc = StreamingContext(self.__sc, batchDuration=5)
         self.__spark = SQLContext(self.__sc)
@@ -40,11 +41,17 @@ class sparkManager():
     def setNaiveBayes(self):
         self.__SAEngine = naiveBayes.naiveBayes(customSparkContext=self.__sc)
 
+
     def analyze(self, rdd):
         df = self.__preprocessRdd(rdd)
+        df.show()
         if df is not None:
             df = self.__SAEngine.predict_df(df)
-            df.show()
+            save(df)
+
+    def save(self, df):
+        save_ = save()
+        save_.save(df, self.__spark)
 
     def __preprocessRdd(self, rdd:RDD):
         rddc = rddCorrector()
@@ -60,7 +67,8 @@ class sparkManager():
 
 
 
-sm = sparkManager(hostname="192.168.1.62", port=1998, appname_="test2", master='spark://192.168.1.33:7077')
+
+sm = sparkManager(hostname="192.168.1.33", port=1998, appname_="test2", master='spark://78.186.219.59:7077')
 #sm = sparkManager(hostname="192.168.1.62", port=1998, appname_="test2", master='local[*]')
 sm.setNaiveBayes()
 sm.startStreaming()
