@@ -96,6 +96,7 @@ class naiveBayes(SAEngine):
         df_model = idf.fit(df)
         df = df_model.transform(df)
         return df
+
     def preproccess(self, df:DataFrame):
         df = self.__preprocess_tdfidf(df)
         return df

@@ -19,19 +19,11 @@ class TwitterListener(StreamListener):
     def on_data(self,data):
         try:
             msg = json.loads(data)
-
-
             self.sqlFunctions.insertTweet( self.sentimentId, data)
-            msg =   msg["id_str"] + msg["text"]
-            #msg["text"].replace('"','\\"')
-            #msg = "{\"id\":\""+  msg["id_str"] + "\", \"raw_data\":\"" +  msg["text"] + "\"}"
-            #msg = self.jsonF.format(msg)
-
-
-            # msg = msg.replace('="', "=>'")
+            msg = msg["id_str"] + msg["text"]
             self.c_socket.send("<tweet>{}</tweet>\n".format(msg).encode("utf-8"))
             return True
-        except KeyError:
+        except Exception:
             return True
 
     def error(self, status):

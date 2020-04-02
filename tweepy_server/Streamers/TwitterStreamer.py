@@ -13,31 +13,35 @@ class TwitterStreamer():
         self.stream = Stream(self.auth.getAuth(), self.listener) 
 
     def checkIns(self):
-        argv = []
-        here = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(here, 'instructions.txt')
-        with open(filename,  "r") as f:
-            for tmp in f:
-                argv.append(tmp.replace('\n',''))
-        #argv = argv.split(' ')
-        print(argv)
-        if(argv[0] ==   "--ID"):
-            self.listener.sentimentId  = int(argv[1])
-            paramList = argv[2:]
-            if(len(paramList) == 0):
-                print("a")
-                #self.c_socket.send(bytes"/msg/"+":/"Error: Missing parameters."/", 'utf-8'))
-            else:
-                #self.c_socket.send(bytes("Stream  tweets for this parameter(s):", 'utf-8'))
-                #for i in paramList:
-                    #self.c_socket.send(bytes(i,'utf-8'))
-                if(paramList[0] == "--filter"):
-                    paramList= paramList[1:]
-                    self.stream.filter(track=paramList, is_async=True, languages=["en"])
-        elif (argv[0] == "--help"):
+        try:
+            argv = []
             here = os.path.dirname(os.path.abspath(__file__))
-            filename = os.path.join(here, 'help.txt')
+            filename = os.path.join(here, 'instructions.txt')
             with open(filename,  "r") as f:
-                self.c_socket.send(bytes(f.read(), 'utf-8'))
-        else:
-            self.c_socket.send,(bytes("Wrong arguments.. Use --help for help", 'utf-8'))
+                for tmp in f:
+                    argv.append(tmp.replace('\n',''))
+            #argv = argv.split(' ')
+            print(argv)
+            if(argv[0] ==   "--ID"):
+                self.listener.sentimentId  = int(argv[1])
+                paramList = argv[2:]
+                if(len(paramList) == 0):
+                    print("a")
+                    #self.c_socket.send(bytes"/msg/"+":/"Error: Missing parameters."/", 'utf-8'))
+                else:
+                    #self.c_socket.send(bytes("Stream  tweets for this parameter(s):", 'utf-8'))
+                    #for i in paramList:
+                        #self.c_socket.send(bytes(i,'utf-8'))
+                    if(paramList[0] == "--filter"):
+                        paramList= paramList[1:]
+                        self.stream.filter(track=paramList, is_async=True, languages=["en"])
+            elif (argv[0] == "--help"):
+                here = os.path.dirname(os.path.abspath(__file__))
+                filename = os.path.join(here, 'help.txt')
+                with open(filename,  "r") as f:
+                    self.c_socket.send(bytes(f.read(), 'utf-8'))
+            else:
+                self.c_socket.send,(bytes("Wrong arguments.. Use --help for help", 'utf-8'))
+        except:
+            print("Error..")
+            self.c_socket.close()

@@ -15,7 +15,7 @@ class DataFrameWorks():
         """RDD to DataFrame"""
         #rdd = rdd.map(lambda l: l.replace("½",""))
 
-        rdd =  rdd.map(lambda l: (l[:18], l[19:]))
+        rdd =  rdd.map(lambda l: (l[:19], l[19:]))
         schema = [StructField("id", StringType(), False),
                   StructField("rawData", StringType(), False),
                   StructField("preprocessedData", ArrayType(elementType=StringType(), containsNull=True), True),

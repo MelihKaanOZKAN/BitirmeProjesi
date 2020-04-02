@@ -2,6 +2,10 @@ class rddCorrector():
     prevRdds = []
 
     def correct(self, text: str):
+
+        if text.startswith("<tweet>") and text.endswith("</tweet>"):
+            return text
+
         if text == '':
             return ''
         if len(self.prevRdds) > 0:

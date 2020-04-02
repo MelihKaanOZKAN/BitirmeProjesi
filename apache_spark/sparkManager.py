@@ -24,6 +24,8 @@ class sparkManager():
         conf.setMaster(master)
         conf.set("spark.executor.memory","4G")
         conf.set("spark.driver.memory","4G")
+        """conf.set("spark.cassandra.connection.host","134.122.166.110")
+        conf.set("spark.cassandra.connection.port","9042")"""
         self.__sc = SparkContext(conf=conf)
         self.__ssc = StreamingContext(self.__sc, batchDuration=5)
         self.__spark = SQLContext(self.__sc)
@@ -44,14 +46,14 @@ class sparkManager():
 
     def analyze(self, rdd):
         df = self.__preprocessRdd(rdd)
-        df.show()
         if df is not None:
             df = self.__SAEngine.predict_df(df)
-            save(df)
+            df = self.save_(df)
+            df.show()
 
-    def save(self, df):
+    def save_(self, df):
         save_ = save()
-        save_.save(df, self.__spark)
+        return save_.savePredicts_DF(df, self.__spark)
 
     def __preprocessRdd(self, rdd:RDD):
         rddc = rddCorrector()
@@ -63,12 +65,14 @@ class sparkManager():
                 df = DataFrameWorks().convertDataFrame(rdd, self.__spark)
                 df = CleanText().clean(df, self.__spark)
                 return df
+        return None
+
 
 
 
 
 
 sm = sparkManager(hostname="192.168.1.33", port=1998, appname_="test2", master='spark://78.186.219.59:7077')
-#sm = sparkManager(hostname="192.168.1.62", port=1998, appname_="test2", master='local[*]')
+#sm = sparkManager(hostname="192.168.1.33", port=1998, appname_="test2", master='local[*]')
 sm.setNaiveBayes()
 sm.startStreaming()

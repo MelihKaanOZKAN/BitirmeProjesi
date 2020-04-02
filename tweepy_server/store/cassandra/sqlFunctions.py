@@ -1,8 +1,8 @@
-import  json
+import  json, threading
 from utils.CassandraConnector import Adapter
 from cassandra.query import BatchStatement
 from cassandra import ConsistencyLevel
-class SqlFunctions():
+class SqlFunctions(threading.Thread):
     __session = None
     def __init__(self):
         self.__session = Adapter().getSession()
