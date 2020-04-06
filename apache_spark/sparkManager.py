@@ -9,16 +9,19 @@ sys.path.append("..")
 from apache_spark.preprocess.DataFrameWorks import DataFrameWorks
 from apache_spark.preprocess.CleanText import CleanText
 from apache_spark.SAEngine.naiveBayesModel import naiveBayes
+from apache_spark.logger import logger
 from utils.rddCorrector import rddCorrector
 from apache_spark.store.cassandra.save import save
 class sparkManager():
 
     __SAEngine = None
-    def __init__(self, hostname: str, port: int, appname_: str, master: str):
+    def __init__(self, hostname: str, port: int, sentimentId: str, master: str):
+        self.logger = logger()
+        self.logger.createLog(sentimentId=sentimentId)
         self.__hostname = hostname
         self.__port = port
-        self.__appName = appname_
-        print("Initializing Spark Instance")
+        self.__appName = "sentiment_" + sentimentId
+        self.logger.log("info", "Initializing Spark Instance")
         conf = SparkConf()
         conf.setAppName(self.__appName)
         conf.setMaster(master)
@@ -31,17 +34,26 @@ class sparkManager():
         self.__spark = SQLContext(self.__sc)
         self.__dataStream = self.__ssc.socketTextStream(hostname=self.__hostname, port=self.__port)
         self.__sc.setLogLevel("ERROR")
-        print("Spark Inıtıalized")
+        self.logger.log("info","Spark Inıtıalized")
 
 
     def startStreaming(self):
+        self.logger.log("info","Starting stream.. ");
         rdds = self.__dataStream
         rdds.foreachRDD(lambda rdd:  self.analyze(rdd))
         self.__ssc.start()
         self.__ssc.awaitTermination()
 
+    def stopStreaming(self):
+        self.logger.log("info","Stopping stream")
+        self.__ssc.stop(False)
+
+    def stopSparkContext(self):
+        self.logger.log("info","Stopping SparkContext")
+        self.__sc.stop()
+
     def setNaiveBayes(self):
-        self.__SAEngine = naiveBayes.naiveBayes(customSparkContext=self.__sc)
+        self.__SAEngine = naiveBayes.naiveBayes(log= self.logger, customSparkContext=self.__sc)
 
 
     def analyze(self, rdd):
@@ -69,10 +81,5 @@ class sparkManager():
 
 
 
-
-
-
-sm = sparkManager(hostname="192.168.1.33", port=1998, appname_="test2", master='spark://78.186.219.59:7077')
-#sm = sparkManager(hostname="192.168.1.33", port=1998, appname_="test2", master='local[*]')
+sm = sparkManager(hostname="192.168.1.33", port=1998, sentimentId="1244", master="spark://192.168.1.33:7077")
 sm.setNaiveBayes()
-sm.startStreaming()

@@ -8,6 +8,7 @@ sys.path.insert(0,parentdir)
 
 from apache_spark.SAEngine.trainData import TrainData
 from apache_spark.SAEngine.SAEngine import SAEngine
+from apache_spark.logger import logger
 from pyspark import SparkConf, SparkContext, SQLContext
 from pyspark.ml.feature import HashingTF, IDF
 from pyspark.mllib.regression import LabeledPoint
@@ -26,9 +27,10 @@ class naiveBayes(SAEngine):
     __modelPath = "hdfs://78.186.219.59:9000/NaiveBayes.model"
     __trainPath = "hdfs://40.87.68.229:9000/trainingdata.csv"
     __testPath = "hdfs://192.168.1.33:9000/testdata.csv"
-    def __init__(self, customSparkContext = None):
-        print("Initializing Naive Bayes..\n")
-        print("Initializing Spark..\n")
+    def __init__(self, log, customSparkContext = None):
+        self.logger = log
+        self.logger.log("info","Initializing Naive Bayes..\n")
+        self.logger.log("info","Initializing Spark..\n")
 
         if customSparkContext == None:
             conf = SparkConf()
@@ -46,14 +48,14 @@ class naiveBayes(SAEngine):
                   )
 
         else:
-            print("Using custom SparkContext.. Skipping.. ")
+            self.logger.log("info","Using custom SparkContext.. Skipping.. ")
             self.__sc = customSparkContext
             self.loadModelFromDisk()
         self.__SQLContext = SQLContext(self.__sc)
-        print("Complate..\n")
+        self.logger.log("info","Complate..\n")
 
     def load_trainData(self):
-        print("Loading train and test data..\n")
+        self.logger.log("info","Loading train and test data..\n")
         self.__trainData.loadData()
         self.__trainData.prepareText()
         self.__trainData.splitData()
@@ -102,18 +104,18 @@ class naiveBayes(SAEngine):
         return df
 
     def loadModelFromDisk(self):
-        print("Loading pretrained model from disk \n")
+        self.logger.log("info","Loading pretrained model from disk \n")
         self.__model = NaiveBayesModel.load(self.__modelPath)
-        print("Complate \n")
+        self.logger.log("info","Complate \n")
 
     def train(self):
-        print("Training Model\n")
+        self.logger.log("info","Training Model\n")
         raw_data = self.__sc.parallelize(self.__documents)
         raw_hashed_tf = raw_data.map(lambda dic: LabeledPoint(dic['label'], compTF(dic['text'])))
         raw_hashed_idf = compIDF(raw_hashed_tf)
         raw_hashed_tfidf = compTFIDF(raw_hashed_tf, raw_hashed_idf)
         self.__model = NaiveBayes.train(raw_hashed_tfidf)
-        print("Complate\n")
+        self.logger.log("info","Complate\n")
 
     def train2(self):
         print("Training Model\n")

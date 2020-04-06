@@ -5,10 +5,10 @@ import threading
 class SqlFunctions(threading.Thread):
     def __init__(self):
         self.session = Adapter().getSession()
-    def savePredicts(self, id, predict):
-        sql = "UPDATE sentiment_analysis.tweet_bank SET pdt_sentiment=? where tweetid=?"
+    def savePredicts(self, id, predict, textClened):
+        sql = "UPDATE sentiment_analysis.tweet_bank SET pdt_sentiment=?, tweet_text_cleaned=? where tweetid=?"
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
         sql = self.session.prepare(sql)
-        batch.add(sql, (predict, id))
+        batch.add(sql, (predict, textClened, id))
         self.session.execute(batch)
         return 1

@@ -1,6 +1,8 @@
 from tweepy_server.Listeners import TwitterListener
 from tweepy_server.TwitterAuthenticator.TwitterAuthenticator import TwitterAuthenticator
+from utils.InstructManager import InstructManager
 from tweepy import Stream
+from utils.hdfsClient import client
 import os
 class TwitterStreamer():
     """
@@ -11,15 +13,13 @@ class TwitterStreamer():
         self.auth = TwitterAuthenticator()
         self.listener = TwitterListener(c_socket)
         self.stream = Stream(self.auth.getAuth(), self.listener) 
-
+        self.ıntMan = InstructManager()
     def checkIns(self):
         try:
             argv = []
-            here = os.path.dirname(os.path.abspath(__file__))
-            filename = os.path.join(here, 'instructions.txt')
-            with open(filename,  "r") as f:
-                for tmp in f:
-                    argv.append(tmp.replace('\n',''))
+            f = self.ıntMan.readInstruct()
+            argv = f.split("\n")
+
             #argv = argv.split(' ')
             print(argv)
             if(argv[0] ==   "--ID"):
