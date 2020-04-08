@@ -19,14 +19,16 @@ class __logger():
     def createLog(self, sentimentId):
         self.__sentimentId = sentimentId
         write = "LOG CREATE TIME: " + self.__getDateTime() + " SentimentId: " + sentimentId
-        self.__writeToFile(write)
+        self.__createFile(write)
     def __writeToFile(self,  text):
         filename = self.__getFileName()
         self.__hdfs.write(filename, text)
-
+    def __createFile(self, text):
+        self.__hdfs.overwrite(self.__getFileName(), text)
     def log(self, mode:str, message:str):
         write = "[" + mode + "] " + self.__getDateTime() + " - " + message
         self.__writeToFile(write)
 @singleton
 class logger(__logger):
     pass
+

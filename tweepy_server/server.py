@@ -1,4 +1,4 @@
-from tweepy_server.Streamers import TwitterStreamer
+from tweepy_server.Streamers.TwitterStreamer import TwitterStreamer
 import socket
 import threading
 class ClientThread(threading.Thread):

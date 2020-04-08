@@ -1,6 +1,6 @@
-import sys,os
+import sys,os,threading
+from signal import signal, SIGINT
 os.environ.setdefault("JAVA_HOME","/Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk/Contents/Home")
-
 from pyspark import RDD
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext
@@ -12,8 +12,7 @@ from apache_spark.SAEngine.naiveBayesModel import naiveBayes
 from apache_spark.logger import logger
 from utils.rddCorrector import rddCorrector
 from apache_spark.store.cassandra.save import save
-class sparkManager():
-
+class sparkManager(threading.Thread):
     __SAEngine = None
     def __init__(self, hostname: str, port: int, sentimentId: str, master: str):
         self.logger = logger()
@@ -27,15 +26,19 @@ class sparkManager():
         conf.setMaster(master)
         conf.set("spark.executor.memory","4G")
         conf.set("spark.driver.memory","4G")
+        conf.set("spark.network.timeout", "600s")
         """conf.set("spark.cassandra.connection.host","134.122.166.110")
         conf.set("spark.cassandra.connection.port","9042")"""
-        self.__sc = SparkContext(conf=conf)
-        self.__ssc = StreamingContext(self.__sc, batchDuration=5)
+        self.__sc = SparkContext.getOrCreate(conf)
+        self.__sc.setLogLevel("ERROR")
+        self.__ssc = StreamingContext(self.__sc, batchDuration=10)
         self.__spark = SQLContext(self.__sc)
         self.__dataStream = self.__ssc.socketTextStream(hostname=self.__hostname, port=self.__port)
-        self.__sc.setLogLevel("ERROR")
         self.logger.log("info","Spark Inıtıalized")
 
+    def quiet(self):
+        log4j = self.__sc._jvm.org.apache.log4j
+        log4j.LogManager.getRootLogger().setLevel(log4j.Level.FATAL)
 
     def startStreaming(self):
         self.logger.log("info","Starting stream.. ");
@@ -46,22 +49,33 @@ class sparkManager():
 
     def stopStreaming(self):
         self.logger.log("info","Stopping stream")
-        self.__ssc.stop(False)
+        self.__ssc.stop(stopSparkContext=True, stopGraceFully=True)
+
+
+
 
     def stopSparkContext(self):
         self.logger.log("info","Stopping SparkContext")
         self.__sc.stop()
+        sys.exit(0)
+
+
 
     def setNaiveBayes(self):
         self.__SAEngine = naiveBayes.naiveBayes(log= self.logger, customSparkContext=self.__sc)
 
+    def isContextRunning(self):
+        print(self.__sc.statusTracker().getActiveJobsIds())
+        if len(self.__sc.statusTracker().getActiveJobsIds()) > 0:
+            return True
+        else:
+            return False
 
     def analyze(self, rdd):
         df = self.__preprocessRdd(rdd)
         if df is not None:
             df = self.__SAEngine.predict_df(df)
             df = self.save_(df)
-            df.show()
 
     def save_(self, df):
         save_ = save()
@@ -78,8 +92,40 @@ class sparkManager():
                 df = CleanText().clean(df, self.__spark)
                 return df
         return None
+sm : sparkManager= None
+def handler(signal_received, frame):
+    if (sm != None):
+        sm.stopStreaming()
+    exit(0)
 
-
-
-sm = sparkManager(hostname="192.168.1.33", port=1998, sentimentId="1244", master="spark://192.168.1.33:7077")
-sm.setNaiveBayes()
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    host = ""
+    port = 0
+    sentimentId = ""
+    master = ""
+    method = ""
+    #sparkManager(hostname="192.168.1.62", port=1998, sentimentId="1245", master="spark://192.168.1.33:7077")
+    try:
+        for index, i in enumerate(args):
+            if i == "--host":
+                host = args[index + 1]
+            if i == "--port":
+                port = int(args[index + 1])
+            if i == "--sentimentId":
+                sentimentId = args[index + 1]
+            if i == "--master":
+                master = args[index + 1]
+            if i == "--method":
+                method = args[index + 1]
+        if host == "" or port == 0 or sentimentId == "" or master == "" or method == "":
+            raise KeyError
+        signal(SIGINT, handler)
+        sm = sparkManager(hostname=host,port=port, sentimentId=sentimentId, master=master)
+        if(method == "naiveBayes"):
+            sm.setNaiveBayes()
+        else:
+            raise Exception("Error: " + method + " doesn't exist")
+        sm.startStreaming()
+    except KeyError:
+        print("Error. Wrong arguments")
