@@ -29,7 +29,7 @@ class sparkManager(threading.Thread):
         conf.set("spark.network.timeout", "600s")
         """conf.set("spark.cassandra.connection.host","134.122.166.110")
         conf.set("spark.cassandra.connection.port","9042")"""
-        self.__sc = SparkContext.getOrCreate(conf)
+        self.__sc: SparkContext = SparkContext.getOrCreate(conf)
         self.__sc.setLogLevel("ERROR")
         self.__ssc = StreamingContext(self.__sc, batchDuration=10)
         self.__spark = SQLContext(self.__sc)
@@ -49,7 +49,11 @@ class sparkManager(threading.Thread):
 
     def stopStreaming(self):
         self.logger.log("info","Stopping stream")
-        self.__ssc.stop(stopSparkContext=True, stopGraceFully=True)
+        self.__ssc.stop(False)
+        tmp = self.isContextRunning()
+        while tmp:
+            tmp = self.isContextRunning()
+        self.stopSparkContext()
 
 
 
@@ -65,17 +69,19 @@ class sparkManager(threading.Thread):
         self.__SAEngine = naiveBayes.naiveBayes(log= self.logger, customSparkContext=self.__sc)
 
     def isContextRunning(self):
-        print(self.__sc.statusTracker().getActiveJobsIds())
-        if len(self.__sc.statusTracker().getActiveJobsIds()) > 0:
+        self.logger.log("info", self.__sc.statusTracker().getActiveJobsIds())
+        if len(self.__sc.statusTracker().getActiveStageIds()) > 0:
             return True
         else:
-            return False
+            return True
+
 
     def analyze(self, rdd):
         df = self.__preprocessRdd(rdd)
         if df is not None:
             df = self.__SAEngine.predict_df(df)
             df = self.save_(df)
+            df.show()
 
     def save_(self, df):
         save_ = save()
@@ -92,11 +98,11 @@ class sparkManager(threading.Thread):
                 df = CleanText().clean(df, self.__spark)
                 return df
         return None
-sm : sparkManager= None
-def handler(signal_received, frame):
-    if (sm != None):
-        sm.stopStreaming()
-    exit(0)
+def smhandler(sm):
+    def handler(signal_received, frame):
+        if (sm != None):
+            sm.stopStreaming()
+    return handler
 
 if __name__ == "__main__":
     args = sys.argv[1:]
@@ -120,12 +126,13 @@ if __name__ == "__main__":
                 method = args[index + 1]
         if host == "" or port == 0 or sentimentId == "" or master == "" or method == "":
             raise KeyError
-        signal(SIGINT, handler)
         sm = sparkManager(hostname=host,port=port, sentimentId=sentimentId, master=master)
         if(method == "naiveBayes"):
             sm.setNaiveBayes()
         else:
             raise Exception("Error: " + method + " doesn't exist")
+
+        signal(SIGINT, smhandler(sm))
         sm.startStreaming()
     except KeyError:
         print("Error. Wrong arguments")

@@ -21,7 +21,7 @@ class client():
         try:
             with self.getClient().open(path) as f:
                 ret = f.read()
-        except OSError:
-            return ""
+        except OSError as e:
+            ret=  e
         ret = str(ret, encoding="utf-8")
         return ret
