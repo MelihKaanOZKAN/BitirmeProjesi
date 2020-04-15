@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+Sentiment Details
+{% endblock %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+    <h1>Sentiment Details</h1>
+            <br>
+    Sentiment Id : {{ sentiment.sentimentid   }}<br>
+    Sentiment Name: {{ sentiment.sentimentname   }}<br>
+    Mode:{{ sentiment.mode   }}<br>
+    Keywords: {{ sentiment.keywords   }}<br>
+    Status: {{ sentiment.status   }}<br>
+    Create Date: {{  sentiment.createdate }}
+            <br>
+   {% if sentiment.startdate != None%}
+    Start Date: {{  sentiment.startdate }}<br>
+            {% else %}
+    Start Date: Not Started<br>
+            {%endif%}
+            {% if sentiment.stopdate != None %}
+    Stop Date: {{  sentiment.stopdate }}<br>
+            {% else %}
+    Stop Date: Not Stopped<br>
+            {%endif%}
+    Notes:{{ sentiment.notes   }}<br>
+    Last Update: {{ sentiment.lastupdate   }}<br>
+            <a href="{{sentiment.get_start_url}}"> <button type="button" class="btn btn-primary">Start Sentiment</button></a>
+            <a href="{{sentiment.get_stop_url}}"> <button type="button" style="margin-left:5px" class="btn btn-danger">Stop Sentiment</button></a>
+    <button type="button" style="margin-left:5px" class="btn btn-info">Check Sentiment Status</button>
+    <button type="button" style="margin-left:5px" class="btn btn-secondary">Report Service</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

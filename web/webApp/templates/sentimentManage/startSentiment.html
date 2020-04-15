@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Start  Sentiment
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <form method="post" >
+    <h1>Start Sentiment</h1>{% csrf_token %}
+    <div>
+        {{ form.sentimentName|as_crispy_field }}
+      </div> <div>
+        {{ form.mode|as_crispy_field }}
+      </div><div >
+        {{ form.keywords|as_crispy_field }}
+      </div> <div>
+        {{ form.notes|as_crispy_field }}
+      </div>
+    <input type="submit" class="btn btn-primary" value="Submit"/>
+</form>
+        </div>
+    </div>
+</div>
+{% endblock %}

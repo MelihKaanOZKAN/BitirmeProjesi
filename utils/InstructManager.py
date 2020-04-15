@@ -18,8 +18,7 @@ class InstructManager():
            self.__writeToFile_overwrite(write)
         else:
             self.__writeToFile(write)
-        print("instruct writed")
-
+        return True
     def __writeToFile(self, text):
          self.__hdfs.write(self.__instructPath,text)
 
