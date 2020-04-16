@@ -14,8 +14,18 @@ Sentiment Details
     Sentiment Id : {{ sentiment.sentimentid   }}<br>
     Sentiment Name: {{ sentiment.sentimentname   }}<br>
     Mode:{{ sentiment.mode   }}<br>
-    Keywords: {{ sentiment.keywords   }}<br>
+    Method :{{ sentiment.method   }}<br>
+
+    Keywords: <ul class="list-group" style="width: 150px;">
+            {% for key in sentiment.keywords   %}
+
+              <li class="list-group-item">{{ key }}</li>
+
+            {% endfor %}
+            </ul>
+            <br>
     Status: {{ sentiment.status   }}<br>
+    is SparkContext Running: {{  sentiment.last_update_text }}<br>
     Create Date: {{  sentiment.createdate }}
             <br>
    {% if sentiment.startdate != None%}
@@ -28,11 +38,18 @@ Sentiment Details
             {% else %}
     Stop Date: Not Stopped<br>
             {%endif%}
-    Notes:{{ sentiment.notes   }}<br>
+     Notes: <ul class="list-group" style="width: 200px;">
+            {% for key in sentiment.notes   %}
+
+              <li class="list-group-item">{{ key }}</li>
+
+            {% endfor %}
+            </ul>
+            <br>
     Last Update: {{ sentiment.lastupdate   }}<br>
             <a href="{{sentiment.get_start_url}}"> <button type="button" class="btn btn-primary">Start Sentiment</button></a>
             <a href="{{sentiment.get_stop_url}}"> <button type="button" style="margin-left:5px" class="btn btn-danger">Stop Sentiment</button></a>
-    <button type="button" style="margin-left:5px" class="btn btn-info">Check Sentiment Status</button>
+            <a href="{{sentiment.get_log_url}}"> <button type="button" style="margin-left:5px" class="btn btn-info"> Sentiment Log</button></a>
     <button type="button" style="margin-left:5px" class="btn btn-secondary">Report Service</button>
         </div>
     </div>

@@ -10,7 +10,9 @@ class tweepyServerModel(DjangoCassandraModel):
 
 
     def writeInstructs(self, sentimentId, mode, keywords):
-        from utils.InstructManager import InstructManager
+        import sys
+        sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
+        from  utils.InstructManager import InstructManager
         im = InstructManager()
         return im.writeInstructions(sentimentId, mode, keywords)
     def generate_address(self):
@@ -38,48 +40,96 @@ class sentiments(DjangoCassandraModel):
     notes = columns.List(columns.Text)
     sentimentname = columns.Text()
     lastupdate=columns.DateTime()
-
+    method = columns.Text()
+    last_update_text = ""
     def get_absolute_url(self):
         return "/sentimentManage/detail/{}".format(self.sentimentid)
     def get_start_url(self):
         return "/sentimentManage/start/{}".format(self.sentimentid)
     def get_stop_url(self):
         return "/sentimentManage/stop/{}".format(self.sentimentid)
+    def get_log_url(self):
+        return "/sentimentManage/log/{}".format(self.sentimentid)
     def check_none(self):
         if self.status == None:
            self.status= "New"
 
+    def get_log_path(self):
+        return "/logs/sentimentlog_" + str(self.sentimentid) + ".log"
 
 
     def startSentiment(self):
-        if self.status != "Running":
+        if len(self.pids) == 0:
             tweepy: tweepyServerModel = tweepyServerModel.objects.get(serverid=1)
             tweepy.writeInstructs(self.sentimentid, self.mode, self.keywords)
             spark_pid =  self.__createSpark(self.sentimentid, tweepy)
             self.pids.append(spark_pid)
             dt = datetime.datetime.now()
-            self.stopdate = dt
+            self.startdate = dt
             self.lastupdate = dt
             self.status = "Running"
             self.save()
+            return True
+        else:
+            return False
 
     def stopSentiment(self):
         if len(self.pids) > 0 and self.status == "Running":
             pid = self.pids[0]
-            import os
-            os.kill(pid, signal.SIGINT)
-            dt = datetime.datetime.now()
-            self.stopdate = dt
-            self.lastupdate = dt
-            self.status = "Stopped"
-            self.save()
+            import os, psutil
+            if psutil.pid_exists(pid):
+                os.kill(pid, signal.SIGINT)
+                dt = datetime.datetime.now()
+                self.stopdate = dt
+                self.lastupdate = dt
+                self.status = "Stop signal"
+                self.save()
+                return True
+            else:
+                self.pids.clear()
+                self.status = "Stopped"
+                self.save()
+                return False
 
     def __createSpark(self, sentimentId: str, tweepy):
         spark:sparkServerModel = sparkServerModel.objects.get(serverid = 1)
-        pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method naiveBayes"
-        cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address()))
-        print("**********"  + cmd)
+        pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method {}"
+        cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address(), self.method))
         FNULL = open(os.devnull, 'w')
         DETACHED_PROCESS = 0x00000008
-        sub = subprocess.Popen(shlex.split(cmd)).pid
+        sub = subprocess.Popen(shlex.split(cmd), stderr=FNULL, stdout=FNULL).pid
         return sub
+
+    def isSparkContextRunning(self):
+        if self.status == "Running":
+            if  len(self.pids) > 0:
+                pid = self.pids[0]
+                try:
+                    import psutil
+                    proc = psutil.Process(pid)
+                    if (proc.status() == psutil.STATUS_RUNNING):
+                        self.last_update_text = "Yes"
+                    else:
+                        self.pids.clear()
+                        if self.status == "Running":
+                            self.status = "DEAD"
+                            dt = datetime.datetime.now()
+                            self.lastupdate = dt
+                        self.save()
+                        self.last_update_text =  "DEAD"
+                except psutil.NoSuchProcess:
+                    self.pids.clear()
+                    if self.status == "Running":
+                        self.status = "DEAD"
+                        dt = datetime.datetime.now()
+                        self.lastupdate = dt
+                    self.save()
+                    self.last_update_text =  "DEAD"
+            else:
+                self.last_update_text =  'DEAD'
+        elif self.status == "NEW":
+            self.last_update_text =  'No Context'
+        else:
+            self.pids.clear()
+            self.save()
+            self.last_update_text =  'Process not found'
