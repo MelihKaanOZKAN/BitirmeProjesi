@@ -8,17 +8,13 @@ sys.path.insert(0,parentdir)
 
 from apache_spark.SAEngine.trainData import TrainData
 from apache_spark.SAEngine.SAEngine import SAEngine
-from apache_spark.logger import logger
 from pyspark import SparkConf, SparkContext, SQLContext
 from pyspark.ml.feature import HashingTF, IDF
 from pyspark.mllib.regression import LabeledPoint
 from pyspark.ml.classification import NaiveBayes
 from pyspark.ml.classification import NaiveBayesModel
-from pyspark.ml import Pipeline
-from pyspark.sql import DataFrame, Column
-from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType,IntegerType
-import utils.naiveBayesPredict as nbp
+from pyspark.sql import DataFrame
+from pyspark.sql.types import IntegerType
 from apache_spark.preprocess.CleanText import CleanText
 class naiveBayes(SAEngine):
     __trainData  = TrainData()
@@ -29,8 +25,8 @@ class naiveBayes(SAEngine):
     __testPath = "hdfs://192.168.1.33:9000/testdata.csv"
     def __init__(self, log, customSparkContext = None):
         self.logger = log
-        self.logger.log("info","Initializing Naive Bayes..\n")
-        self.logger.log("info","Initializing Spark..\n")
+        self.logger.log("info","Initializing Naive Bayes..")
+        self.logger.log("info","Initializing Spark..")
 
         if customSparkContext == None:
             conf = SparkConf()
@@ -52,10 +48,10 @@ class naiveBayes(SAEngine):
             self.__sc = customSparkContext
             self.loadModelFromDisk()
         self.__SQLContext = SQLContext(self.__sc)
-        self.logger.log("info","Complate..\n")
+        self.logger.log("info","Complate..")
 
     def load_trainData(self):
-        self.logger.log("info","Loading train and test data..\n")
+        self.logger.log("info","Loading train and test data..")
         self.__trainData.loadData()
         self.__trainData.prepareText()
         self.__trainData.splitData()
@@ -67,7 +63,7 @@ class naiveBayes(SAEngine):
             self.__documents_test.append({"text": p, "label": 1})
         for p in self.__trainData.negative_test:
             self.__documents_test.append({"text": p, "label": 0})
-        print("Complate..\n")
+        print("Complate..")
 
     def load_train(self):
        train_df = self.__SQLContext.read.csv(header=True, path=self.__trainPath)
@@ -104,18 +100,18 @@ class naiveBayes(SAEngine):
         return df
 
     def loadModelFromDisk(self):
-        self.logger.log("info","Loading pretrained model from disk \n")
+        self.logger.log("info","Loading pretrained model from disk")
         self.__model = NaiveBayesModel.load(self.__modelPath)
-        self.logger.log("info","Complate \n")
+        self.logger.log("info","Complate..")
 
     def train(self):
-        self.logger.log("info","Training Model\n")
+        self.logger.log("info","Training Model")
         raw_data = self.__sc.parallelize(self.__documents)
         raw_hashed_tf = raw_data.map(lambda dic: LabeledPoint(dic['label'], compTF(dic['text'])))
         raw_hashed_idf = compIDF(raw_hashed_tf)
         raw_hashed_tfidf = compTFIDF(raw_hashed_tf, raw_hashed_idf)
         self.__model = NaiveBayes.train(raw_hashed_tfidf)
-        self.logger.log("info","Complate\n")
+        self.logger.log("info","Complate")
 
     def train2(self):
         print("Training Model\n")

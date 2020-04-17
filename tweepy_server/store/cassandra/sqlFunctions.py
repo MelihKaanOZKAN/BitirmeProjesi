@@ -13,7 +13,7 @@ class SqlFunctions(threading.Thread):
         text = tweetJson['text']
         tweet = str(tweet).replace("'", "''") #escape single quetes 
         tweet = tweet.replace('"', '""') #escape double quetes
-        sql = 'INSERT INTO tweet_bank (sentimentId, tweetId, tweet, tweet_text) values(?, ?, ?, ?)'
+        sql = 'INSERT INTO db.tweet_bank (sentimentId, tweetId, tweet, tweet_text) values(?, ?, ?, ?)'
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
         sql = self.__session.prepare(sql)
         batch.add(sql, (sentimentId, id_, tweet, text))

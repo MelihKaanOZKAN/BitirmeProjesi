@@ -31,7 +31,7 @@ class SMManager():
 
     def startStream(self, sentimentId:str, mode:str, keywords:list):
         if self.__smDict.isEmptyId(sentimentId):
-            self.__IM.writeInstructions(sentimentId, mode, keywords, True)
+            #self.__IM.writeInstructions(sentimentId, mode, keywords, True)
             time.sleep(1.0)
             self.__createSpark(sentimentId)
         else:
@@ -59,6 +59,5 @@ class SMManager():
         pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host 192.168.1.62 --port 1998 --sentimentId " + sentimentId + "  --master spark://192.168.1.33:7077 --method naiveBayes"
         FNULL = open(os.devnull, 'w')
         DETACHED_PROCESS = 0x00000008
-        sub = subprocess.Popen(shlex.split(pc)).pid
+        sub = subprocess.Popen(shlex.split(pc))
         #sub = subprocess.Popen(shlex.split(pc), shell=False, stdin=FNULL, stdout=FNULL, stderr=FNULL, close_fds=True).pid
-        self.__smDict.add(sentimentId, sub)

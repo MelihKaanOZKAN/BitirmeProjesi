@@ -9,14 +9,14 @@ sys.path.append("..")
 from apache_spark.preprocess.DataFrameWorks import DataFrameWorks
 from apache_spark.preprocess.CleanText import CleanText
 from apache_spark.SAEngine.naiveBayesModel import naiveBayes
-from apache_spark.logger import logger
+from utils.logger import logger
 from utils.rddCorrector import rddCorrector
 from apache_spark.store.cassandra.save import save
 class sparkManager(threading.Thread):
     __SAEngine = None
     def __init__(self, hostname: str, port: int, sentimentId: str, master: str):
         self.logger = logger()
-        self.logger.createLog(sentimentId=sentimentId)
+        self.logger.setSentiemtnId(sentimentId)
         self.__hostname = hostname
         self.__port = port
         self.__appName = "sentiment_" + sentimentId
@@ -80,8 +80,8 @@ class sparkManager(threading.Thread):
         df = self.__preprocessRdd(rdd)
         if df is not None:
             df = self.__SAEngine.predict_df(df)
-            df = self.save_(df)
-            df.show()
+            self.save_(df).select("save_status").show(2, False)
+
 
     def save_(self, df):
         save_ = save()

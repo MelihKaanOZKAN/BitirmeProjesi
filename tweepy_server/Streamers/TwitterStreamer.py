@@ -47,7 +47,7 @@ class TwitterStreamer():
             #argv = argv.split(' ')
             print(argv)
             if(argv[0] ==   "--ID"):
-                self.listener.sentimentId  = int(argv[1])
+                self.listener.sentimentId  = argv[1]
                 paramList = argv[2:]
                 if(len(paramList) == 0):
                     print("Error")

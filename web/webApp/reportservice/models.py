@@ -9,9 +9,10 @@ class report(DjangoCassandraModel):
     sentimentId = columns.Integer()
     reportFilePath = columns.Text()
 
-class tweet():
-    tweetId = 0
-    data = ""
-    filteredWords = []
-    sentiment = -1
-    sentimentId = 0
+class tweet_bank(DjangoCassandraModel):
+    tweetid = columns.Text(primary_key=True)
+    pdt_sentiment = columns.Double()
+    sentimentid = columns.Text()
+    tweet = columns.Text()
+    tweet_text = columns.Text()
+    tweet_text_cleaned = columns.List(columns.Text)

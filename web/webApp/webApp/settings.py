@@ -88,7 +88,7 @@ DATABASES = {
                 'strategy_class': 'SimpleStrategy',
                 'replication_factor': 1
             }
-                    }
+        }
     }
 }
 # Password validation

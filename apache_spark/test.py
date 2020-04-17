@@ -3,7 +3,7 @@ from utils.InstructManager import InstructManager
 import time
 def spark():
     sm = SMManager()
-    sm.startStream("1480", "filter", ["trump"])
+    sm.startStream("7a1e693a-821b-4924-b341-52e2bcc8276e", "filter", ["trump"])
     time.sleep(30)
     sm.stopStream("1480")
     print("Stop Signal")

@@ -14,7 +14,7 @@ class tweepyServerModel(DjangoCassandraModel):
         sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
         from  utils.InstructManager import InstructManager
         im = InstructManager()
-        return im.writeInstructions(sentimentId, mode, keywords)
+        return im.writeInstructions(sentimentId, mode, keywords, True)
     def generate_address(self):
         return self.address + ":" + str(self.port)
 
@@ -95,10 +95,11 @@ class sentiments(DjangoCassandraModel):
         spark:sparkServerModel = sparkServerModel.objects.get(serverid = 1)
         pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method {}"
         cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address(), self.method))
+        print(cmd)
         FNULL = open(os.devnull, 'w')
         DETACHED_PROCESS = 0x00000008
-        sub = subprocess.Popen(shlex.split(cmd), stderr=FNULL, stdout=FNULL).pid
-        return sub
+        sub = subprocess.Popen(shlex.split(cmd), stderr=FNULL, stdout=FNULL)
+        return sub.pid
 
     def isSparkContextRunning(self):
         if self.status == "Running":
