@@ -17,4 +17,11 @@ class SqlFunctions(threading.Thread):
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
         sql = self.__session.prepare(sql)
         batch.add(sql, (sentimentId, id_, tweet, text))
-        self.__session.execute(batch) #execute sql
+        self.__session.execute(batch)
+    def insertPid(self, pid, sentimentId):
+       sql = "UPDATE db.sentiments SET pids = pids + [?] where sentimentid=?"
+       batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+       sql = self.__session.prepare(sql)
+       import uuid
+       batch.add(sql, (pid, uuid.UUID(sentimentId)))
+       self.__session.execute(batch)

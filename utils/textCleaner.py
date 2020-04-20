@@ -82,4 +82,4 @@ class textCleaner():
     def unicode2tutf8(self, text):
         u2utf8 = unicode2utf8.unicode2utf8()
         return u2utf8.convert(text)
-    
+

@@ -1,5 +1,6 @@
 from hdfs3 import core
-class client():
+import threading
+class client(threading.Thread):
     __client = None
     def __init__(self):
         cr = core
@@ -23,8 +24,9 @@ class client():
         try:
             with self.getClient().open(path) as f:
                 ret = f.read()
-
-            ret = str(ret, encoding="utf-8")
         except OSError as e:
             ret = str(e)
+
+        if type(ret) != str:
+                ret = str(ret, encoding="utf-8")
         return ret

@@ -1,5 +1,5 @@
 import sys,os,threading
-from signal import signal, SIGINT
+from signal import signal, SIGUSR1
 os.environ.setdefault("JAVA_HOME","/Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk/Contents/Home")
 from pyspark import RDD
 from pyspark import SparkContext, SparkConf
@@ -42,37 +42,38 @@ class sparkManager(threading.Thread):
 
     def startStreaming(self):
         self.logger.log("info","Starting stream.. ");
-        rdds = self.__dataStream
+        rdds = self.__dataStream.window(20,20)
         rdds.foreachRDD(lambda rdd:  self.analyze(rdd))
         self.__ssc.start()
         self.__ssc.awaitTermination()
 
     def stopStreaming(self):
         self.logger.log("info","Stopping stream")
-        self.__ssc.stop(False)
         tmp = self.isContextRunning()
+        import time
         while tmp:
+            time.sleep(5)
             tmp = self.isContextRunning()
         self.stopSparkContext()
-
 
 
 
     def stopSparkContext(self):
         self.logger.log("info","Stopping SparkContext")
         self.__sc.stop()
-        sys.exit(0)
 
 
 
     def setNaiveBayes(self):
         self.__SAEngine = naiveBayes.naiveBayes(log= self.logger, customSparkContext=self.__sc)
 
+    count = 0
     def isContextRunning(self):
-        self.logger.log("info", self.__sc.statusTracker().getActiveJobsIds())
-        if len(self.__sc.statusTracker().getActiveStageIds()) > 0:
-            return True
+        jobs = self.__sc.statusTracker().getActiveJobsIds()
+        if len(jobs) == 1 and jobs[0] == 4 and self.count > 10:
+            return False
         else:
+            self.count = self.count + 1
             return True
 
 
@@ -80,7 +81,7 @@ class sparkManager(threading.Thread):
         df = self.__preprocessRdd(rdd)
         if df is not None:
             df = self.__SAEngine.predict_df(df)
-            self.save_(df).select("save_status").show(2, False)
+            self.save_(df).show(20, False)
 
 
     def save_(self, df):
@@ -98,9 +99,14 @@ class sparkManager(threading.Thread):
                 df = CleanText().clean(df, self.__spark)
                 return df
         return None
-def smhandler(sm):
+def smhandler(sm, sentimentId):
     def handler(signal_received, frame):
         if (sm != None):
+            import sys
+            sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
+            from utils.hdfsClient import client
+            tmp = client()
+            tmp.overwrite(path="/tweepy/" + sentimentId + "_stop.txt", data="stop")
             sm.stopStreaming()
     return handler
 
@@ -132,7 +138,8 @@ if __name__ == "__main__":
         else:
             raise Exception("Error: " + method + " doesn't exist")
 
-        signal(SIGINT, smhandler(sm))
+
+        signal(SIGUSR1, smhandler(sm, sentimentId))
         sm.startStreaming()
     except KeyError:
         print("Error. Wrong arguments")

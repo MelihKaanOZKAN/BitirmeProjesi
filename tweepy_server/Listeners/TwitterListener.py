@@ -5,6 +5,7 @@ import sys, os, time, socket
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.JsonFormatter import JsonFormatter
 #from utils.textCleaner import textCleaner
+from utils.hdfsClient import client
 from tweepy_server.store.cassandra import SqlFunctions
 from http.client import IncompleteRead as http_incompleteRead
 from urllib3.exceptions import IncompleteRead as urllib3_incompleteRead
@@ -18,12 +19,15 @@ class TwitterListener(StreamListener):
         self.c_socket: socket.socket = c_socket
         self.sqlFunctions = SqlFunctions()
         self.jsonF = JsonFormatter()
+        self.cl = client()
 
     def on_exception(self, exception):
         print(exception)
         return
     def on_data(self,data):
         try:
+            if self.cl.read("/tweepy/" + self.sentimentId + "_stop.txt") == "stop":
+                return False
             msg = json.loads(data)
             if msg["lang"] == "en":
                 self.sqlFunctions.insertTweet( self.sentimentId, data)

@@ -20,6 +20,7 @@ class TwitterStreamer():
         while True:
             try:
                 self.stream.filter(track=paramList, stall_warnings=True)
+                print("Stop Signal")
                 break
             except tweepy.TweepError as e:
                 print("Tweepy Error is: ", e.reason)
@@ -43,14 +44,18 @@ class TwitterStreamer():
             argv = []
             f = self.ıntMan.readInstruct()
             argv = f.split("\n")
-
             #argv = argv.split(' ')
             print(argv)
             if(argv[0] ==   "--ID"):
-                self.listener.sentimentId  = argv[1]
+                sentimentId = argv[1]
+                self.listener.sentimentId  = sentimentId
+                pid = int(os.getpid())
+                from tweepy_server.store.cassandra.sqlFunctions import SqlFunctions
+                sq = SqlFunctions()
+                #sq.insertPid(pid, sentimentId)
                 paramList = argv[2:]
                 if(len(paramList) == 0):
-                    print("Error")
+                    print("Error argv len")
                 else:
                     #self.c_socket.send(bytes("Stream  tweets for this parameter(s):", 'utf-8'))
                     #for i in paramList:
@@ -68,6 +73,6 @@ class TwitterStreamer():
                     self.c_socket.send(bytes(f.read(), 'utf-8'))
             else:
                 self.c_socket.send(bytes("Wrong arguments.. Use --help for help", 'utf-8'))
-        except:
-            print("Error..")
+        except Exception as e:
+            print("Error.." + str(e))
             self.c_socket.close()
