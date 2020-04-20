@@ -52,7 +52,7 @@ class sparkManager(threading.Thread):
         tmp = self.isContextRunning()
         import time
         while tmp:
-            time.sleep(5)
+            time.sleep(2)
             tmp = self.isContextRunning()
         self.stopSparkContext()
 
@@ -69,11 +69,15 @@ class sparkManager(threading.Thread):
 
     count = 0
     def isContextRunning(self):
-        jobs = self.__sc.statusTracker().getActiveJobsIds()
-        if len(jobs) == 1 and jobs[0] == 4 and self.count > 10:
-            return False
-        else:
+        jobs = self.__sc.statusTracker().getActiveStageIds()
+        self.logger.log("log", jobs)
+        if len(jobs) == 1 and jobs[0] == 5:
+            if self.count > 3:
+                return False
+
             self.count = self.count + 1
+            return True
+        else:
             return True
 
 

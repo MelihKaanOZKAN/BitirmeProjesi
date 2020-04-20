@@ -22,8 +22,11 @@ class client(threading.Thread):
     def read(self, path):
         ret = ""
         try:
-            with self.getClient().open(path) as f:
-                ret = f.read()
+            try:
+                with self.getClient().open(path) as f:
+                    ret = f.read()
+            except Exception:
+                ret = "File not found."
         except OSError as e:
             ret = str(e)
 
