@@ -47,7 +47,7 @@ def detail(request,reportid):
         content = c.read(rpt.reportFilePath)
     elif rpt.reporttype == "pie":
         image = c.readByte(rpt.get_report_path())
-        staticName = "/static/report_{}.png".format(rpt.reportid)
+        staticName = "/static/reports/report_{}.png".format(rpt.reportid)
         path = "/Users/melihozkan/Desktop/Projects/BitirmeProjesi/web/webApp" + staticName
         with open(path, "wb") as writer:
             writer.write(image)

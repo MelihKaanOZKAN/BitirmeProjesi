@@ -1,4 +1,4 @@
-import uuid
+import uuid, pdfkit
 from cassandra.cqlengine import columns
 from django_cassandra_engine.models import DjangoCassandraModel
 import sys
@@ -17,6 +17,9 @@ class report(DjangoCassandraModel):
         return "/reportService/detail/{}".format(self.reportid)
     def get_report_path(self):
         return "/reports/report_{}.report".format(self.reportid)
+    def get_pdf_download(self):
+        self.generatePdf()
+        return self.getStatic()
     def __get__results(self):
         total = tweet_bank.objects.filter(sentimentid=self.sentimentid).count()
         processed = tweet_bank.objects.filter(sentimentid=self.sentimentid, pdt_sentiment__gte=0).count()
@@ -52,6 +55,32 @@ class report(DjangoCassandraModel):
             self.get_text_result()
         elif self.reporttype == "pie":
             self.get_pie_chart()
+    def writeToHTMLFromTemplate(self):
+        html = ""
+        with open('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/web/webApp/templates/reportService/report.html', "r") as read:
+            html += read.read()
+        html = html.replace('[Report_Id]', str(self.reportid))
+        html = html.replace('[Report_Name]', self.reportname)
+        html = html.replace('[Report_Date]', str(self.reportdate))
+        html = html.replace('[SentimentId]', self.sentimentid)
+        html = html.replace('[content]', self.readhdfs())
+        return html
+    def readhdfs(self):
+        c = client()
+        if self.reporttype == "text":
+            read = c.read(self.reportFilePath)
+            return read.replace('\n','<br>')
+        elif self.reporttype == "pie":
+            staticName = "/static/reports/report_{}.png".format(self.reportid)
+            path = "/Users/melihozkan/Desktop/Projects/BitirmeProjesi/web/webApp" + staticName
+            content = "<img style=\"width:500px; height=500px\" src=\"{}\" alt=\"Pie Report\">".format(path)
+            return content
+    def getStatic(self):
+        return "/static/reports/report_{}.pdf".format(self.reportid)
+    def generatePdf(self):
+        html = self.writeToHTMLFromTemplate()
+        pdfkit.from_string(html, "/Users/melihozkan/Desktop/Projects/BitirmeProjesi/web/webApp" + self.getStatic())
+
 class tweet_bank(DjangoCassandraModel):
     tweetid = columns.Text(primary_key=True)
     pdt_sentiment = columns.Double()
