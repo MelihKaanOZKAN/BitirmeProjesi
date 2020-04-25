@@ -70,7 +70,6 @@ class sparkManager(threading.Thread):
     count = 0
     def isContextRunning(self):
         jobs = self.__sc.statusTracker().getActiveStageIds()
-        self.logger.log("log", jobs)
         if len(jobs) == 1 and jobs[0] == 5:
             if self.count > 3:
                 return False

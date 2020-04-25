@@ -25,11 +25,24 @@ class client(threading.Thread):
             try:
                 with self.getClient().open(path) as f:
                     ret = f.read()
-            except Exception:
-                ret = "File not found."
+            except Exception as e:
+                ret = "File not found." + str(e)
         except OSError as e:
             ret = str(e)
 
         if type(ret) != str:
                 ret = str(ret, encoding="utf-8")
         return ret
+    def readByte(self, path):
+        ret = ""
+        with self.getClient().open(path) as f:
+                    ret = f.read()
+        return ret
+    def writeMathplot(self, path, plt):
+        import io
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        with self.getClient().open(path, "wb") as writer:
+            writer.write(buf.getvalue())
+        buf.close()

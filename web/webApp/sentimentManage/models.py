@@ -49,8 +49,11 @@ class sentiments(DjangoCassandraModel):
     lastupdate=columns.DateTime()
     method = columns.Text()
     last_update_text = ""
+
     def get_absolute_url(self):
         return "/sentimentManage/detail/{}".format(self.sentimentid)
+    def get_report_url(self):
+        return "/reportService/index/{}".format(self.sentimentid)
     def get_start_url(self):
         return "/sentimentManage/start/{}".format(self.sentimentid)
     def get_stop_url(self):
@@ -60,11 +63,8 @@ class sentiments(DjangoCassandraModel):
     def check_none(self):
         if self.status == None:
            self.status= "New"
-
     def get_log_path(self):
         return "/logs/sentimentlog_" + str(self.sentimentid) + ".log"
-
-
     def startSentiment(self):
         if len(self.pids) == 0:
             tweepy: tweepyServerModel = tweepyServerModel.objects.get(serverid=1)
@@ -80,7 +80,6 @@ class sentiments(DjangoCassandraModel):
             return True
         else:
             return False
-
     def stopSentiment(self):
         if len(self.pids) > 0 and self.status == "Running":
             pid = self.pids[0]
@@ -98,8 +97,7 @@ class sentiments(DjangoCassandraModel):
                 self.status = "Stopped"
                 self.save()
                 return False
-
-    def __createSpark(self, sentimentId: str, tweepy):
+    def __createSpark(self, tweepy):
         spark:sparkServerModel = sparkServerModel.objects.get(serverid = 1)
         pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method {}"
         cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address(), self.method))
@@ -108,7 +106,6 @@ class sentiments(DjangoCassandraModel):
         DETACHED_PROCESS = 0x00000008
         sub = subprocess.Popen(shlex.split(cmd), stderr=FNULL, stdout=FNULL)
         return sub.pid
-
     def checkPids(self, noPid):
         if len(self.pids) > 0:
             pid = self.pids[0]

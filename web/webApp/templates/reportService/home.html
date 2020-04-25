@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+            <div style="margin:  5px 5px 5px 5px">
+
+    <a href={{ create }} ><button  style="margin-top:10px" type="button" class="btn btn-primary">Create Report</button></a>
+            </div>
+        </div>
+    <div class="col-10">
+  <h2>Reports</h2>
+  <p>Reports at sentiment {{ sentimentId }}</p>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ReportId</th>
+        <th>Report Name</th>
+        <th>Report Date</th>
+        <th>Report Type</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if reports %}
+    {% for snt in reports %}
+           <tr>
+        <td>{{ snt.reportid }}</td>
+        <td>{{ snt.reportname }}</td>
+        <td>{{ snt.reportdate }}</td>
+        <td>{{ snt.reporttype }}</td>
+               <td><a href="{{snt.get_absolute_url}}"><button type="button" class="btn btn-info" >Info</button></a></td>
+      </tr>
+    {% endfor %}
+{% endif %}
+    </tbody>
+  </table>
+</div>
+</div>
+  
+{% endblock %}
