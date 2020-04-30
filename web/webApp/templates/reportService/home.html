@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Home
+    Analysis Reports
 {% endblock %}
 
 {% block body %}
@@ -16,7 +16,7 @@
         </div>
     <div class="col-10">
   <h2>Reports</h2>
-  <p>Reports at sentiment {{ sentimentId }}</p>
+  <p> Analysis {{ sentimentId }}'s Reports</p>
   <table class="table table-hover">
     <thead>
       <tr>
@@ -41,7 +41,26 @@
 {% endif %}
     </tbody>
   </table>
+   <br>
+        <div class="pagination">
+    <span class="step-links">
+        {% if reports.has_previous %}
+            <a class="previous" href="?page=1">first</a>
+            <a class="previous" href="?page={{ reports.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ reports.number }} of {{ reports.paginator.num_pages }}.
+        </span>
+
+        {% if reports.has_next %}
+            <a  class="next" href="?page={{ reports.next_page_number }}">next</a>
+            <a class="next" href="?page={{ reports.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
 </div>
 </div>
-  
+</div>
+</div>
+
 {% endblock %}

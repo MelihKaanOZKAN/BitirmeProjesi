@@ -3,9 +3,19 @@ import datetime, uuid
 from .forms import sentimentForm
 from .models import *
 from django.contrib import messages as msg
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 # Create your views here.
 def sentiment_index(request):
     snts = sentiments.objects.all()
+    paginator = Paginator(snts, 5)
+    page = request.GET.get('page')
+    try:
+        snts = paginator.page(page)
+    except PageNotAnInteger:
+        snts = paginator.page(1)
+    except EmptyPage:
+        snts = paginator.page(paginator.num_pages)
+
     context = {
         'sentiments' : snts
     }

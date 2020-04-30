@@ -61,9 +61,42 @@ class report(DjangoCassandraModel):
             html += read.read()
         html = html.replace('[Report_Id]', str(self.reportid))
         html = html.replace('[Report_Name]', self.reportname)
-        html = html.replace('[Report_Date]', str(self.reportdate))
+        date = str(self.reportdate.day) + "/" + str(self.reportdate.month) + "/" + str(self.reportdate.year)  + " " + str(self.reportdate.hour) +"."+str(self.reportdate.minute) + ":" + str(self.reportdate.second)
+        html = html.replace('[Report_Date]', date)
         html = html.replace('[SentimentId]', self.sentimentid)
         html = html.replace('[content]', self.readhdfs())
+        import sys, uuid
+        sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/web/webApp')
+        from sentimentManage.models import sentiments
+
+        snt:sentiments = sentiments.objects.get(sentimentid = uuid.UUID(self.sentimentid))
+        date = str(snt.startdate.day) + "/" + str(snt.startdate.month) + "/" + str(
+            snt.startdate.year) + " " + str(snt.startdate.hour) + "." + str(
+            snt.startdate.minute) + ":" + str(snt.startdate.second)
+
+        html = html.replace('[startDate]',date)
+        date = str(snt.stopdate.day) + "/" + str(snt.stopdate.month) + "/" + str(
+            snt.stopdate.year) + " " + str(snt.stopdate.hour) + "." + str(
+            snt.stopdate.minute) + ":" + str(snt.stopdate.second)
+        html = html.replace('[stopDate]', date)
+        html = html.replace('[method]', snt.method)
+        html = html.replace('[sentimentName]', snt.sentimentname)
+        keywords = ""
+        for index, i in enumerate(snt.keywords):
+            keywords+=i
+            if index < len(snt.keywords) -1:
+                keywords += ", "
+        notes = ""
+        for index, i in enumerate(snt.notes):
+            notes += i
+            if index < len(snt.notes) - 1:
+                notes += ", "
+        html = html.replace('[keywords]', keywords)
+        html = html.replace('[notes]', notes)
+        import datetime
+        now = datetime.datetime.now()
+        date = str(now.day) + "/" + str(now.month) + "/" + str(now.year)
+        html = html.replace('[now]', date)
         return html
     def readhdfs(self):
         c = client()

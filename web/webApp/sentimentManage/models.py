@@ -70,7 +70,7 @@ class sentiments(DjangoCassandraModel):
             tweepy: tweepyServerModel = tweepyServerModel.objects.get(serverid=1)
             tweepy.writeInstructs(self.sentimentid, self.mode, self.keywords)
             tweepy.writeStopFile(self.sentimentid)
-            spark_pid =  self.__createSpark(self.sentimentid, tweepy)
+            spark_pid =  self.__createSpark(tweepy)
             self.pids.append(spark_pid)
             dt = datetime.datetime.now()
             self.startdate = dt
@@ -98,13 +98,19 @@ class sentiments(DjangoCassandraModel):
                 self.save()
                 return False
     def __createSpark(self, tweepy):
+        import sys
+        sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
+        from utils.logger import logger
+        log = logger()
+        log.createLog(str(self.sentimentid))
         spark:sparkServerModel = sparkServerModel.objects.get(serverid = 1)
         pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method {}"
         cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address(), self.method))
-        print(cmd)
         FNULL = open(os.devnull, 'w')
+
         DETACHED_PROCESS = 0x00000008
         sub = subprocess.Popen(shlex.split(cmd), stderr=FNULL, stdout=FNULL)
+        log.log("info", "Subprocess Created")
         return sub.pid
     def checkPids(self, noPid):
         if len(self.pids) > 0:

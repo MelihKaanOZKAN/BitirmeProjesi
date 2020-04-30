@@ -2,17 +2,17 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-Sentiment Details
+Analysis Details
 {% endblock %}
 {% block body %}
 
 <div class="container">
     <div class="row">
         <div class="col-md-10">
-    <h1>Sentiment Details</h1>
+    <h1>Analysis Details</h1>
             <br>
-    Sentiment Id : {{ sentiment.sentimentid   }}<br>
-    Sentiment Name: {{ sentiment.sentimentname   }}<br>
+    Analysis Id : {{ sentiment.sentimentid   }}<br>
+    Analysis Name: {{ sentiment.sentimentname   }}<br>
     Mode:{{ sentiment.mode   }}<br>
     Method :{{ sentiment.method   }}<br>
 
@@ -47,9 +47,9 @@ Sentiment Details
             </ul>
             <br>
     Last Update: {{ sentiment.lastupdate   }}<br>
-            <a href="{{sentiment.get_start_url}}"> <button type="button" class="btn btn-primary">Start Sentiment</button></a>
-            <a href="{{sentiment.get_stop_url}}"> <button type="button" style="margin-left:5px" class="btn btn-danger">Stop Sentiment</button></a>
-            <a href="{{sentiment.get_log_url}}"> <button type="button" style="margin-left:5px" class="btn btn-info"> Sentiment Log</button></a>
+            <a href="{{sentiment.get_start_url}}"> <button type="button" class="btn btn-primary">Start Analysis</button></a>
+            <a href="{{sentiment.get_stop_url}}"> <button type="button" style="margin-left:5px" class="btn btn-danger">Stop Analysis</button></a>
+            <a href="{{sentiment.get_log_url}}"> <button type="button" style="margin-left:5px" class="btn btn-info"> Analysis Log</button></a>
             <a href="{{sentiment.get_report_url}}">  <button type="button" style="margin-left:5px" class="btn btn-secondary">Report Service</button></a>
         </div>
     </div>

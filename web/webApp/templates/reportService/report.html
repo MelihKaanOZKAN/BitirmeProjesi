@@ -3,13 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title>Report [Report_Id]</title>
+    <style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
 </head>
 <body>
-Report ID : [Report_Id] <br>
-Report Name: [Report_Name] <br>
-Report Date: [Report_Date] <br>
-Sentiment Id: [SentimentId] <br>
-Result: <br>
-[content]
+<center><h1>Analysis Report</h1></center>
+<br>
+<table>
+    <tr>
+        <th colspan="2">Report Info</th>
+    </tr>
+    <tr>
+        <td>Report ID</td>
+        <td>[Report_Id]</td>
+    </tr>
+    <tr>
+        <td> Report Name</td>
+        <td> [Report_Name]</td>
+    </tr>
+     <tr>
+        <td> Report Date</td>
+        <td> [Report_Date]</td>
+    </tr>
+    <tr>
+        <th colspan="2">Analysis Info</th>
+    </tr>
+     <tr>
+        <td> Analysis Id</td>
+        <td> [SentimentId]</td>
+    </tr> <tr>
+        <td> Analysis Name</td>
+        <td> [sentimentName]</td>
+    </tr>
+    <tr>
+        <td> Start Date</td>
+        <td> [startDate]</td>
+    </tr>
+    <tr>
+        <td> Stop Date</td>
+        <td> [stopDate]</td>
+    </tr>
+    <tr>
+        <td> Analysis Method</td>
+        <td> [method]</td>
+    </tr>
+    <tr>
+        <td> Keywords </td>
+        <td> [keywords]</td>
+    </tr>
+    <tr>
+        <td> Notes</td>
+        <td> [notes]</td>
+    </tr>
+    <tr>
+        <th colspan="2">Result</th>
+    </tr>
+    <tr>
+        <td colspan="2">[content]</td>
+    </tr>
+</table> <br>
+<div style="margin-top:10px; float:right">
+    Date: [now] <br>
+    Name: ................. <br>
+    Signature: ................ <br>
+</div>
 </body>
 </html>

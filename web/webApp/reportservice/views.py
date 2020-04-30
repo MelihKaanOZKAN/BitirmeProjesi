@@ -3,6 +3,7 @@ from .forms import reportForm
 from .models import *
 import uuid, datetime
 from django.contrib import messages as msg
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 # Create your views here.
 import sys
 sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
@@ -11,6 +12,14 @@ def index(request, sentimentId):
     rpts = []
     try:
         rpts = report.objects.filter(sentimentid = sentimentId)
+        paginator = Paginator(rpts, 5)
+        page = request.GET.get('page')
+        try:
+            rpts = paginator.page(page)
+        except PageNotAnInteger:
+            rpts = paginator.page(1)
+        except EmptyPage:
+            rpts = paginator.page(paginator.num_pages)
 
     except Exception as ex:
         print(str(ex))
