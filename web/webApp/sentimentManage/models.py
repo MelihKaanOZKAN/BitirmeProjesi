@@ -1,4 +1,4 @@
-import uuid
+import uuid, sys
 from cassandra.cqlengine import columns
 from django_cassandra_engine.models import DjangoCassandraModel
 import subprocess, time, os, shlex, signal, datetime
@@ -80,6 +80,7 @@ class sentiments(DjangoCassandraModel):
             return True
         else:
             return False
+
     def stopSentiment(self):
         if len(self.pids) > 0 and self.status == "Running":
             pid = self.pids[0]
@@ -97,6 +98,10 @@ class sentiments(DjangoCassandraModel):
                 self.status = "Stopped"
                 self.save()
                 return False
+
+
+    def eprint(self, *args, **kwargs):
+        print(*args, file=sys.stderr, **kwargs)
     def __createSpark(self, tweepy):
         import sys
         sys.path.append('/Users/melihozkan/Desktop/Projects/BitirmeProjesi/')
@@ -106,6 +111,7 @@ class sentiments(DjangoCassandraModel):
         spark:sparkServerModel = sparkServerModel.objects.get(serverid = 1)
         pc = "python /Users/melihozkan/Desktop/Projects/BitirmeProjesi/sparkManager.py --host {} --port {} --sentimentId {}  --master {} --method {}"
         cmd = (pc.format(tweepy.address, tweepy.port, self.sentimentid, spark.generate_address(), self.method))
+        self.eprint(cmd)
         FNULL = open(os.devnull, 'w')
 
         DETACHED_PROCESS = 0x00000008
