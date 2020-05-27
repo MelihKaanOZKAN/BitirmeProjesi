@@ -39,6 +39,20 @@ class TwitterStreamer():
                 pass
             except UnicodeDecodeError as e:
                 pass
+    def sendTweets(self,tweets):
+        from utils.hdfsClient import client
+        cl = client()
+        count = 0
+        for i in tweets:
+            id = i["tweetid"]
+            text = i["tweet_text"]
+            msg2 = id + text
+            if cl.read("/tweepy/" + self.sentimentId + "_stop.txt") == "stop":
+                print("Stop Signal")
+                break
+                self.c_socket.send("<tweet>{}</tweet>\n".format(msg2).encode("utf-8"))
+                print(count)
+                count = count + 1
     def checkIns(self):
         try:
             argv = []
@@ -62,7 +76,12 @@ class TwitterStreamer():
                         #self.c_socket.send(bytes(i,'utf-8'))
                     if(paramList[0] == "--filter"):
                         paramList= paramList[1:]
-                        self.filter(paramList=paramList)
+                        self.filter(paramList=paramList),
+                    if (paramList[0] == "--resume"):
+                        from tweepy_server.store.cassandra.sqlFunctions import SqlFunctions
+                        sql = SqlFunctions()
+                        tweets = sql.getTweets(sentimentId)
+                        sendTweets(tweets)
 
 
 
@@ -76,3 +95,4 @@ class TwitterStreamer():
         except Exception as e:
             print("Error.." + str(e))
             self.c_socket.close()
+

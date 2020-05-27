@@ -35,7 +35,7 @@ class testViews(TestCase):
         a = time.time()
         while True:
             snt.isSparkContextRunning()
-            if snt.status !=  'NEW' or snt.status != 'Running':
+            if snt.last_update_text != 'Yes':
                 break
         b = time.time()
         total = float(b - a)

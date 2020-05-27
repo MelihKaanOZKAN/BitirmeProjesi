@@ -42,10 +42,11 @@ class sparkManager(threading.Thread):
 
     def startStreaming(self):
         self.logger.log("info","Starting stream.. ");
-        rdds = self.__dataStream.window(20,20)
+        rdds = self.__dataStream
         rdds.foreachRDD(lambda rdd:  self.analyze(rdd))
         self.__ssc.start()
         self.__ssc.awaitTermination()
+
 
     def stopStreaming(self):
         self.logger.log("info","Stopping stream")
@@ -71,7 +72,7 @@ class sparkManager(threading.Thread):
     def isContextRunning(self):
         jobs = self.__sc.statusTracker().getActiveStageIds()
         if len(jobs) == 1 and jobs[0] == 5:
-            if self.count > 3:
+            if self.count > 4:
                 return False
 
             self.count = self.count + 1

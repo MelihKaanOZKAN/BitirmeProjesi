@@ -16,13 +16,13 @@ Analysis Details
     Mode:{{ sentiment.mode   }}<br>
     Method :{{ sentiment.method   }}<br>
 
-    Keywords: <ul class="list-group" style="width: 150px;">
+    Keywords: <div style="overflow: scroll; width: 200px; height:130px;" ><ul class="list-group" style="width: 200px;">
             {% for key in sentiment.keywords   %}
 
               <li class="list-group-item">{{ key }}</li>
 
             {% endfor %}
-            </ul>
+        </ul></div>
             <br>
     Status: {{ sentiment.status   }}<br>
     is SparkContext Running: {{  sentiment.last_update_text }}<br>
@@ -38,16 +38,17 @@ Analysis Details
             {% else %}
     Stop Date: Not Stopped<br>
             {%endif%}
-     Notes: <ul class="list-group" style="width: 200px;">
+     Notes: <div style="overflow: scroll; width: 200px; height:130px;"><ul class="list-group" style="width: 200px;">
             {% for key in sentiment.notes   %}
 
               <li class="list-group-item">{{ key }}</li>
 
             {% endfor %}
-            </ul>
+        </ul></div>
             <br>
     Last Update: {{ sentiment.lastupdate   }}<br>
             <a href="{{sentiment.get_start_url}}"> <button type="button" class="btn btn-primary">Start Analysis</button></a>
+            <a href="{{sentiment.get_resume_url}}"> <button type="button" class="btn btn-primary">Resume Analysis</button></a>
             <a href="{{sentiment.get_stop_url}}"> <button type="button" style="margin-left:5px" class="btn btn-danger">Stop Analysis</button></a>
             <a href="{{sentiment.get_log_url}}"> <button type="button" style="margin-left:5px" class="btn btn-info"> Analysis Log</button></a>
             <a href="{{sentiment.get_report_url}}">  <button type="button" style="margin-left:5px" class="btn btn-secondary">Report Service</button></a>

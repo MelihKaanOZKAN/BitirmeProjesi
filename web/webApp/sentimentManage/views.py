@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 # Create your views here.
 def sentiment_index(request):
     snts = sentiments.objects.all()
+
     paginator = Paginator(snts, 5)
     page = request.GET.get('page')
     try:
@@ -36,6 +37,18 @@ def sentiment_start(request, sentimentId):
     snt = get_object_or_404(sentiments, sentimentid = id)
     if snt.status != "Running":
         if  snt.startSentiment():
+            msg.success(request, sentimentId + " Started")
+        else:
+            msg.error(request, "Process  exists")
+    else:
+        msg.error(request, sentimentId +" already running.")
+
+    return HttpResponseRedirect(snt.get_absolute_url())
+def sentiment_resume(request, sentimentId):
+    id = uuid.UUID(sentimentId)
+    snt = get_object_or_404(sentiments, sentimentid = id)
+    if snt.status != "Running":
+        if  snt.resumeSentiment():
             msg.success(request, sentimentId + " Started")
         else:
             msg.error(request, "Process  exists")

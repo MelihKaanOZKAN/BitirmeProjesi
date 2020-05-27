@@ -56,6 +56,8 @@ class sentiments(DjangoCassandraModel):
         return "/reportService/index/{}".format(self.sentimentid)
     def get_start_url(self):
         return "/sentimentManage/start/{}".format(self.sentimentid)
+    def get_resume_url(self):
+        return "/sentimentManage/resume/{}".format(self.sentimentid)
     def get_stop_url(self):
         return "/sentimentManage/stop/{}".format(self.sentimentid)
     def get_log_url(self):
@@ -65,6 +67,10 @@ class sentiments(DjangoCassandraModel):
            self.status= "New"
     def get_log_path(self):
         return "/logs/sentimentlog_" + str(self.sentimentid) + ".log"
+
+    def resumeSentiment(self):
+        self.mode = "resume"
+        return self.startSentiment()
     def startSentiment(self):
         if len(self.pids) == 0:
             tweepy: tweepyServerModel = tweepyServerModel.objects.get(serverid=1)

@@ -8,6 +8,8 @@ class InstructManager():
         write = "--ID\n" + str(sentimentId)
         if mode == "filter":
             write += "\n--filter\n"
+        elif mode == "resume":
+            write += "\n--resume\n"
         else:
             print("wrong mode")
         for index, i in enumerate(keywords):

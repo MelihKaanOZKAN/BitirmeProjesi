@@ -13,7 +13,7 @@ class SqlFunctions(threading.Thread):
         text = tweetJson['text']
         tweet = str(tweet).replace("'", "''") #escape single quetes 
         tweet = tweet.replace('"', '""') #escape double quetes
-        sql = 'INSERT INTO db.tweet_bank (sentimentId, tweetId, tweet, tweet_text) values(?, ?, ?, ?)'
+        sql = 'INSERT INTO db.tweet_bank (sentimentId, tweetid, tweet, tweet_text, pdt_sentiment) values(?, ?, ?, ?, -2)'
         batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
         sql = self.__session.prepare(sql)
         batch.add(sql, (sentimentId, id_, tweet, text))
@@ -25,3 +25,10 @@ class SqlFunctions(threading.Thread):
        import uuid
        batch.add(sql, (pid, uuid.UUID(sentimentId)))
        self.__session.execute(batch)
+
+    def getTweets(self, sentimentId):
+        sql = "SELECT tweetid, tweet_text FROM db.sentiments WHERE sentimentid =? and pdt_sentiment = -2"
+        batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+        sql = self.__session.prepare(sql)
+        batch.add(sql, (sentimentId))
+        return self.__session.execute(batch)
